@@ -28,7 +28,9 @@ RUN docker-php-ext-install \
     mysqli \
     opcache \
     gmp \
-    pdo_sqlite
+    pdo_sqlite \
+    mbstring \
+    bcmath
 
 # Installe Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
