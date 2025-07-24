@@ -1,0 +1,492 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de gestion des catégories",
+        "description": "Documentation pour l'API de gestion des catégories de votre application.",
+        "contact": {
+            "email": "votre_email@example.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/categories": {
+            "get": {
+                "summary": "Récupérer toutes les catégories",
+                "operationId": "3f5817a34833d0a1f4af4548dd3aeaba",
+                "responses": {
+                    "200": {
+                        "description": "Liste des catégories"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Ajouter nouvelle categorie",
+                "operationId": "71fcad552bb0eaba9fb191fd8d8dcab0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Categorie est crée"
+                    }
+                }
+            }
+        },
+        "/api/categories/{id}": {
+            "put": {
+                "summary": "Mettre à jour la categorie",
+                "operationId": "0e686b2748211cc688333ed705dc111f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Categorie est mise à jour"
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Supprimer la categorie",
+                "operationId": "4c12e22a7f8c617bd83bfa1fdc05428d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Categorie est supprimé"
+                    }
+                }
+            }
+        },
+        "/api/evenements": {
+            "get": {
+                "summary": "Récupérer toutes les evenements",
+                "operationId": "cf17114513864def8e795303a48f7205",
+                "responses": {
+                    "200": {
+                        "description": "Liste des evenements",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Ajouter un evenement",
+                "operationId": "6cc07eed54d06683e60f49ae4d921be1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "titre",
+                                    "description",
+                                    "place",
+                                    "date_event",
+                                    "heure",
+                                    "image",
+                                    "user_id",
+                                    "categorie_id"
+                                ],
+                                "properties": {
+                                    "titre": {
+                                        "type": "text"
+                                    },
+                                    "description": {
+                                        "type": "text"
+                                    },
+                                    "place": {
+                                        "type": "text"
+                                    },
+                                    "date_event": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "heure": {
+                                        "type": "text"
+                                    },
+                                    "image": {
+                                        "type": "text"
+                                    },
+                                    "user_id": {
+                                        "type": "text"
+                                    },
+                                    "categorie_id": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Evenement es crée"
+                    }
+                }
+            }
+        },
+        "/api/evenements/{id}": {
+            "put": {
+                "summary": "Mise à jour de l'evenement",
+                "operationId": "4c5cc09e979a893b3a326e10e79dc12a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "titre",
+                                    "description",
+                                    "place",
+                                    "date_event",
+                                    "heure",
+                                    "image",
+                                    "user_id",
+                                    "categorie_id"
+                                ],
+                                "properties": {
+                                    "titre": {
+                                        "type": "text"
+                                    },
+                                    "description": {
+                                        "type": "text"
+                                    },
+                                    "place": {
+                                        "type": "text"
+                                    },
+                                    "date_event": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "heure": {
+                                        "type": "text"
+                                    },
+                                    "image": {
+                                        "type": "text"
+                                    },
+                                    "user_id": {
+                                        "type": "text"
+                                    },
+                                    "categorie_id": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Evenement est mise à jour"
+                    },
+                    "404": {
+                        "description": "Event not found"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Supprimer un evenement",
+                "operationId": "86e6f8fa5098872c9168eef893ab3876",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Evenement est supprimé"
+                    }
+                }
+            }
+        },
+        "/api/games": {
+            "get": {
+                "summary": "Récupérer toutes les games",
+                "operationId": "93736f40a135111a310e4b25ad61f30b",
+                "responses": {
+                    "200": {
+                        "description": "Liste des games"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Crée nouveau jeu",
+                "operationId": "b8b9557618eb0f7b3650bdd4ab3a6487",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "groupe_id",
+                                    "candidat"
+                                ],
+                                "properties": {
+                                    "groupe_id": {
+                                        "type": "text"
+                                    },
+                                    "candidat": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Jeu est crée"
+                    }
+                }
+            }
+        },
+        "/api/games/{id}": {
+            "put": {
+                "summary": "Modifier Jeu",
+                "operationId": "7a7a51e92437ab9405a4bd9153eacec7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "groupe_id",
+                                    "candidat"
+                                ],
+                                "properties": {
+                                    "groupe_id": {
+                                        "type": "text"
+                                    },
+                                    "candidat": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Jeu est mise à jour"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Supprimer le Jeu",
+                "operationId": "1b52414d7af18b35901add3451cba91c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Jeu est supprimé"
+                    }
+                }
+            }
+        },
+        "/api/groupes": {
+            "get": {
+                "summary": "Récupérer toutes les groupes",
+                "operationId": "26d7d88b4311ae1b78103608d47b81a0",
+                "responses": {
+                    "200": {
+                        "description": "Liste des groupes"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Crée nouveau groupe",
+                "operationId": "33946dfdde0bd3f489dddc4e178fb457",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "text"
+                                    },
+                                    "user_id": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Groupe est crée"
+                    }
+                }
+            }
+        },
+        "/api/groupes/{id}": {
+            "put": {
+                "summary": "Modifier groupe",
+                "operationId": "91fa79eb5b9600ea3c3cc9343cf76529",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "text"
+                                    },
+                                    "user_id": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Groupe est mise à jour"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Supprimer le groupe",
+                "operationId": "06878a9780474377f9383bc62a498772",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Groupe est supprimé"
+                    }
+                }
+            }
+        }
+    },
+    "tags": []
+}
