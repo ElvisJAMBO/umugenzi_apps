@@ -23,8 +23,8 @@ RUN apk add --no-cache \
 # Installe les extensions PHP nécessaires
 RUN docker-php-ext-install \
     pdo \
-    pdo_mysql \ # Vous pouvez le laisser ou le supprimer si vous ne l'utilisez jamais
-    pdo_sqlite \ # ESSENTIEL pour SQLite
+    pdo_mysql \
+    pdo_sqlite \
     zip \
     gd \
     intl \
