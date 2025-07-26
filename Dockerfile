@@ -1,7 +1,7 @@
 # Utilise une image PHP officielle avec Alpine pour la légèreté.
 FROM php:8.2-fpm-alpine
 
-# Installe les dépendances système requises
+# Installe les dépendances système requises pour Laravel et PHP
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -18,7 +18,10 @@ RUN apk add --no-cache \
     sqlite-dev \
     curl-dev \
     openssl-dev \
-    libintl
+    libintl \
+    libjpeg-turbo-dev \
+    php8-dom \
+    php8-2-dev
 
 # Installe les extensions PHP nécessaires
 RUN docker-php-ext-install \
