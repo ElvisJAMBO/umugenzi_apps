@@ -20,8 +20,8 @@ RUN apk add --no-cache \
     openssl-dev \
     libintl \
     libjpeg-turbo-dev \
-    php8-dom \
-    php8-2-dev
+    php82-dom \
+    php82-dev
 
 # Installe les extensions PHP nécessaires
 RUN docker-php-ext-install \
