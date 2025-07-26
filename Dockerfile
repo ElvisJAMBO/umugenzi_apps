@@ -16,9 +16,9 @@ RUN apk add --no-cache \
     icu-dev \
     libxml2-dev \
     sqlite-dev \
-    onig-dev \
     curl-dev \
-    openssl-dev
+    openssl-dev \
+    libintl
 
 # Installe les extensions PHP nécessaires
 RUN docker-php-ext-install \
@@ -32,7 +32,8 @@ RUN docker-php-ext-install \
     pcntl \
     bcmath \
     opcache \
-    xml
+    xml \
+    mbstring
 
 # Configure Nginx pour servir l'application Laravel
 COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
