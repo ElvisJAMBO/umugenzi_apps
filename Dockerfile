@@ -1,61 +1,66 @@
-# Utilise une image PHP officielle avec FPM (FastCGI Process Manager)
+# Utilise une image PHP officielle avec Alpine pour la légèreté.
 FROM php:8.2-fpm-alpine
 
-# Installe les dépendances système nécessaires
+# Installe les dépendances système requises
 RUN apk add --no-cache \
     nginx \
     supervisor \
+    bash \
+    git \
     build-base \
     autoconf \
     libzip-dev \
-    oniguruma-dev \
     libpng-dev \
     jpeg-dev \
-    libjpeg-turbo-dev \
-    libwebp-dev \
-    libxml2-dev \
     freetype-dev \
-    gmp-dev \
-    sqlite-dev
+    icu-dev \
+    libxml2-dev \
+    sqlite-dev \ # Nécessaire pour SQLite
+    onig-dev \
+    curl-dev \
+    openssl-dev
 
-# Installe les extensions PHP requises par Laravel
+# Installe les extensions PHP nécessaires
 RUN docker-php-ext-install \
-    pdo_mysql \
+    pdo \
+    pdo_mysql \ # Vous pouvez le laisser ou le supprimer si vous ne l'utilisez jamais
+    pdo_sqlite \ # ESSENTIEL pour SQLite
     zip \
+    gd \
+    intl \
     exif \
     pcntl \
-    gd \
-    mysqli \
+    bcmath \
     opcache \
-    gmp \
-    pdo_sqlite \
-    mbstring \
-    bcmath
+    xml
 
-# Installe Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Configure Nginx pour servir l'application Laravel
+COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
 
-# Définit le répertoire de travail dans le conteneur
+# Copie le fichier de configuration PHP-FPM
+COPY docker/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
+
+# Crée un répertoire pour l'application et définit les permissions
 WORKDIR /var/www/html
 
-# Copie le code de l'application dans le conteneur
-COPY . .
+# Copie l'application Laravel dans le conteneur
+COPY . /var/www/html
 
-# Définit les permissions pour le répertoire de stockage et le cache de Laravel
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+# Installe Composer globalement
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 # Installe les dépendances Composer
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Génère la clé d'application Laravel
-RUN php artisan key:generate
+# Ajuste les permissions pour le stockage et le cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Lance les migrations de la base de données (si nécessaire)
-# RUN php artisan migrate --force
+# Expose le port 80 (Nginx)
+EXPOSE 80
 
-# Expose le port 9000 pour PHP-FPM
-EXPOSE 9000
+# Configure Supervisor pour gérer Nginx et PHP-FPM
+COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Commande par défaut pour exécuter PHP-FPM
-CMD ["php-fpm"]
+# Commande par défaut pour lancer l'application avec Supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
