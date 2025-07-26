@@ -15,7 +15,7 @@ RUN apk add --no-cache \
     freetype-dev \
     icu-dev \
     libxml2-dev \
-    sqlite-dev \ # Nécessaire pour SQLite
+    sqlite-dev \
     onig-dev \
     curl-dev \
     openssl-dev
