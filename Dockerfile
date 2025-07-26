@@ -21,7 +21,10 @@ RUN apk add --no-cache \
     libintl \
     libjpeg-turbo-dev \
     php82-dom \
-    php82-dev
+    php82-dev \
+    zlib-dev \
+    gmp-dev \
+    libxslt-dev
 
 # Installe les extensions PHP nécessaires
 RUN docker-php-ext-install \
