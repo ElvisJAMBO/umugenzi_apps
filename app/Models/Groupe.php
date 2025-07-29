@@ -24,4 +24,9 @@ class Groupe extends Model
     {
         $this->attributes['name'] = 'Groupe' . Carbon::now()->format('Y-m-d_H-i-s');
     }
+
+    public function games()
+    {
+        return $this->hasMany(Game::class);
+    }
 }

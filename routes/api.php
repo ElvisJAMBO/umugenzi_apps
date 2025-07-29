@@ -55,6 +55,7 @@ Route::apiResource('typetickets',TypeticketController::class);
 Route::apiResource('tickets',TicketController::class);
 Route::apiResource('reservations',ReservationController::class);
 Route::apiResource('groupes',GroupeController::class);
+Route::get('/groupe/{groupeId}/tirage', [GroupeController::class, 'effectuerTirageAuSort']);
 Route::apiResource('games',GameController::class);
 
 Route::get('/evenements/category/{id}', [EvenementController::class, 'filterEvent']);

@@ -402,13 +402,9 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
                                     "user_id"
                                 ],
                                 "properties": {
-                                    "name": {
-                                        "type": "text"
-                                    },
                                     "user_id": {
                                         "type": "text"
                                     }
@@ -483,6 +479,27 @@
                 "responses": {
                     "204": {
                         "description": "Groupe est supprimé"
+                    }
+                }
+            }
+        },
+        "/api/groupe/{id}/tirage": {
+            "get": {
+                "summary": "Résultats de tirage au sort",
+                "operationId": "825b33b5299ac6c434c6c82d9802169b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Voici le résultat"
                     }
                 }
             }
