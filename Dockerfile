@@ -15,6 +15,7 @@ RUN apk update && apk add --no-cache \
     postgresql-dev \
     mysql-client \
     mysql-dev \
+    libzip-dev \
     && rm -rf /var/cache/apk/*
 
 # Configuration et installation des extensions PHP
