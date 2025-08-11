@@ -8,15 +8,15 @@ use Illuminate\Http\Response;
 
 class PermissionController extends Controller
 {
-    public function __construct()
-    {
-        // Appliquer des middlewares pour sécuriser l'accès aux opérations de permission
-        $this->middleware('auth:sanctum');
-        $this->middleware('can:view permissions')->only(['index', 'show']);
-        $this->middleware('can:create permissions')->only('store');
-        $this->middleware('can:edit permissions')->only('update');
-        $this->middleware('can:delete permissions')->only('destroy');
-    }
+    // public function __construct()
+    // {
+    //     // Appliquer des middlewares pour sécuriser l'accès aux opérations de permission
+    //     $this->middleware('auth:sanctum');
+    //     $this->middleware('can:view permissions')->only(['index', 'show']);
+    //     $this->middleware('can:create permissions')->only('store');
+    //     $this->middleware('can:edit permissions')->only('update');
+    //     $this->middleware('can:delete permissions')->only('destroy');
+    // }
 
     /**
      * Display a listing of the resource.

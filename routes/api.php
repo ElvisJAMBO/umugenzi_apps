@@ -12,6 +12,7 @@ use App\Http\Controllers\GroupeController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,16 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user()->load('roles', 'permissions'); // Charger les rôles/permissions de l'utilisateur connecté
     });
-    // Routes pour les Rôles
-    Route::apiResource('roles', RoleController::class);
-    Route::post('users/assign-role', [RoleController::class, 'assignRoleToUser']);
-    Route::post('users/revoke-role', [RoleController::class, 'revokeRoleFromUser']);
 
-    // Routes pour les Permissions
-    Route::apiResource('permissions', PermissionController::class);
-
-    // Routes pour les Utilisateurs (protégées par des permissions)
-    Route::apiResource('users', UserController::class);
 });
 
 Route::apiResource('categories',CategoryController::class);
@@ -59,5 +51,19 @@ Route::get('/groupe/{groupeId}/tirage', [GroupeController::class, 'effectuerTira
 Route::apiResource('games',GameController::class);
 
 Route::get('/evenements/category/{id}', [EvenementController::class, 'filterEvent']);
+
+// Routes pour les Rôles
+Route::apiResource('roles', RoleController::class);
+Route::post('users/assign-role', [RoleController::class, 'assignRoleToUser']);
+Route::post('users/revoke-role', [RoleController::class, 'revokeRoleFromUser']);
+
+// Routes pour les Permissions
+Route::apiResource('permissions', PermissionController::class);
+
+// Routes pour les Utilisateurs (protégées par des permissions)
+Route::apiResource('users', UserController::class);
+Route::post('storeAdmin', [UserController::class, 'storeAdmin']);
+
+    
 
 

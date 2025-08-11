@@ -10,16 +10,15 @@ use App\Http\Controllers\Controller;
 
 class RoleController extends Controller
 {
-    public function __construct()
-    {
-        // Appliquer des middlewares pour sécuriser l'accès aux opérations de rôle
-        // Assurez-vous d'avoir ces permissions créées ou adaptez-les.
-        $this->middleware('auth:sanctum');
-        $this->middleware('can:view roles')->only(['index', 'show']);
-        $this->middleware('can:create roles')->only('store');
-        $this->middleware('can:edit roles')->only('update');
-        $this->middleware('can:delete roles')->only('destroy');
-    }
+    // public function __construct()
+    // {
+        
+    //     $this->middleware('auth:sanctum');
+    //     $this->middleware('can:view roles')->only(['index', 'show']);
+    //     $this->middleware('can:create roles')->only('store');
+    //     $this->middleware('can:edit roles')->only('update');
+    //     $this->middleware('can:delete roles')->only('destroy');
+    // }
 
     /**
      * Display a listing of the resource.
