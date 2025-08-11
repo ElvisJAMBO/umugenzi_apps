@@ -161,57 +161,49 @@ class GroupeController extends Controller
      */
     public function effectuerTirageAuSort($groupeId)
     {
-        
         $groupe = Groupe::with('games')->findOrFail($groupeId);
-        
         $games = $groupe->games->pluck('candidat')->toArray();
-        
 
-        // 1. Vérifier si le nombre de joueurs est pair
-        if (count($games) % 2 !== 0) {
-            return response()->json([
-                'message' => 'Le nombre de joueurs doit être pair pour effectuer le tirage au sort.',
-                'code' => 400
-            ], 400);
-        }
-
+        // 1. Vérification minimale : il faut au moins deux joueurs
         if (count($games) < 2) {
             return response()->json([
-                'message' => 'Il faut au moins deux joueurs.',
+                'message' => 'Il faut au moins deux joueurs pour effectuer un tirage au sort.',
                 'code' => 400
             ], 400);
         }
 
         $tirages = [];
-        $tentativesMax = 100; // Pour éviter les boucles infinies en cas de cas complexe
+        $tentativesMax = 100;
         $tentativeActuelle = 0;
 
         do {
             $tirages = [];
-            $gamesDisponibles = $games;
-            $gamesCibles = Arr::shuffle($games); // Mélangez les noms cibles
+            $joueursDisponibles = $games;
+            $joueursCiblesPotentielles = Arr::shuffle($games);
 
             $reussite = true;
-            foreach ($gamesDisponibles as $game) {
+
+            foreach ($joueursDisponibles as $joueur) {
                 $cibleTrouvee = false;
                 $tentativesCiblePourJoueur = 0;
-                $maxTentativesCiblePourJoueur = count($gamesCibles) * 2;
+                $maxTentativesCiblePourJoueur = count($joueursCiblesPotentielles) * 2;
 
-                while(!$cibleTrouvee && count($gamesCibles) > 0 && $tentativesCiblePourJoueur < $maxTentativesCiblePourJoueur)
-                {
-                    $randomIndex = array_rand($gamesCibles);
-                    $cible = $gamesCibles[$randomIndex];
+                while (!$cibleTrouvee && count($joueursCiblesPotentielles) > 0 && $tentativesCiblePourJoueur < $maxTentativesCiblePourJoueur) {
+                    $randomIndex = array_rand($joueursCiblesPotentielles);
+                    $cible = $joueursCiblesPotentielles[$randomIndex];
 
-                    if ($game !== $cible) {
-                        $tirages[$game] = $cible;
-                        array_splice($gamesCibles, $randomIndex, 1); 
+                    // Condition principale : le joueur ne peut pas tirer son propre nom
+                    if ($joueur !== $cible) {
+                        $tirages[$joueur] = $cible;
+                        // On retire la cible de la liste des cibles potentielles pour qu'elle ne soit pas réutilisée
+                        array_splice($joueursCiblesPotentielles, $randomIndex, 1);
                         $cibleTrouvee = true;
                     }
                     $tentativesCiblePourJoueur++;
                 }
-                
+
                 if (!$cibleTrouvee) {
-                    $reussite = false; // Impossible de trouver une cible pour ce joueur
+                    $reussite = false;
                     break;
                 }
             }
@@ -226,7 +218,6 @@ class GroupeController extends Controller
             ], 500);
         }
 
-        // Afficher les résultats du tirage
         return response()->json([
             'message' => 'Tirage au sort effectué avec succès.',
             'tirages' => $tirages,
