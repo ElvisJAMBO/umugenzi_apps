@@ -23,6 +23,18 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    /**
+     * @OA\Get(
+     *     path="/api/users",
+     *     summary="Récupérer toutes les utilisateurs",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des utilisateurs",
+     *         @OA\JsonContent(type="array", @OA\Items(type="string"))
+     *     )
+     * )
+     */
     public function index()
     {
         // Inclure les rôles et permissions de chaque utilisateur
@@ -32,6 +44,28 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage (pour l'admin).
+     */
+
+    /**
+     * @OA\Post(
+     *     path="/api/users",
+     *     summary="Ajouter un utilisateur",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","phone","adresse","password"},
+     *             @OA\Property(property="name", type="text"),
+     *             @OA\Property(property="email", type="text"),
+     *             @OA\Property(property="phone", type="text"),
+     *             @OA\Property(property="adresse", type="date"),
+     *             @OA\Property(property="password", type="text")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User est crée"
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -65,6 +99,38 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+    /**
+     * @OA\Put(
+     *     path="/api/users/{id}",
+     *     summary="Mise à jour de l'utilisateur",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","phone","adresse","password"},
+     *             @OA\Property(property="name", type="text"),
+     *             @OA\Property(property="email", type="text"),
+     *             @OA\Property(property="phone", type="text"),
+     *             @OA\Property(property="adresse", type="date"),
+     *             @OA\Property(property="password", type="text")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User est mise à jour"
+     *     ),
+    *      @OA\Response(
+    *          response=404,
+    *          description="User not found"
+    *      )
+     * )
+     */
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -96,12 +162,51 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+
+    /**
+     * @OA\Delete(
+     *     path="/api/users/{id}",
+     *     summary="Supprimer un utilisateur",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="User est supprimé"
+     *     )
+     * )
+     */
     public function destroy(User $user)
     {
         $user->delete();
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 
+
+    /**
+     * @OA\Post(
+     *     path="/api/storeAdmin",
+     *     summary="Ajouter un admin",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","phone","adresse","password"},
+     *             @OA\Property(property="name", type="text"),
+     *             @OA\Property(property="email", type="text"),
+     *             @OA\Property(property="phone", type="text"),
+     *             @OA\Property(property="adresse", type="date"),
+     *             @OA\Property(property="password", type="text")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User est crée"
+     *     )
+     * )
+     */
     public function storeAdmin(Request $request)
     {
         $user = new User();
