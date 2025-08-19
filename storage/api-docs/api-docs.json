@@ -536,8 +536,7 @@
                                     "name",
                                     "email",
                                     "phone",
-                                    "adresse",
-                                    "password"
+                                    "adresse"
                                 ],
                                 "properties": {
                                     "name": {
@@ -552,9 +551,6 @@
                                     "adresse": {
                                         "type": "string",
                                         "format": "date"
-                                    },
-                                    "password": {
-                                        "type": "text"
                                     }
                                 },
                                 "type": "object"
@@ -592,8 +588,7 @@
                                     "name",
                                     "email",
                                     "phone",
-                                    "adresse",
-                                    "password"
+                                    "adresse"
                                 ],
                                 "properties": {
                                     "name": {
@@ -606,10 +601,6 @@
                                         "type": "text"
                                     },
                                     "adresse": {
-                                        "type": "string",
-                                        "format": "date"
-                                    },
-                                    "password": {
                                         "type": "text"
                                     }
                                 },
@@ -660,8 +651,7 @@
                                     "name",
                                     "email",
                                     "phone",
-                                    "adresse",
-                                    "password"
+                                    "adresse"
                                 ],
                                 "properties": {
                                     "name": {
@@ -674,10 +664,6 @@
                                         "type": "text"
                                     },
                                     "adresse": {
-                                        "type": "string",
-                                        "format": "date"
-                                    },
-                                    "password": {
                                         "type": "text"
                                     }
                                 },
