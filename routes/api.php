@@ -13,6 +13,7 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +64,7 @@ Route::apiResource('permissions', PermissionController::class);
 // Routes pour les Utilisateurs (protégées par des permissions)
 Route::apiResource('users', UserController::class);
 Route::post('storeAdmin', [UserController::class, 'storeAdmin']);
+Route::put('update-user/{user}', [ProfileController::class, 'update']);
 
     
 

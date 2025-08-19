@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash; // Pour hacher les mots de passe
 use Spatie\Permission\Models\Role; // Pour gérer les rôles
+use App\Mail\UserCreatedNotification;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -74,7 +76,7 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->phone = $request->phone;
         $user->adresse = $request->adresse;
-        $user->password = Hash::make($request->password);
+        $user->password = Hash::make("Abcd@1234");
         $user->save();
 
         if ($request->has('roles')) {
@@ -84,6 +86,8 @@ class UserController extends Controller
             // Par exemple, si l'admin oublie d'assigner un rôle, on pourrait lui donner 'client' ou 'user'
             $user->assignRole('agent'); // Ou un autre rôle par défaut si l'admin ne spécifie rien
         }
+
+        Mail::to($user->email)->send(new UserCreatedNotification($user));
 
         return response()->json($user->load('roles', 'permissions'), Response::HTTP_CREATED);
     }
@@ -117,7 +121,7 @@ class UserController extends Controller
      *             @OA\Property(property="name", type="text"),
      *             @OA\Property(property="email", type="text"),
      *             @OA\Property(property="phone", type="text"),
-     *             @OA\Property(property="adresse", type="date"),
+     *             @OA\Property(property="adresse", type="text"),
      *             @OA\Property(property="password", type="text")
      *         )
      *     ),
@@ -197,7 +201,7 @@ class UserController extends Controller
      *             @OA\Property(property="name", type="text"),
      *             @OA\Property(property="email", type="text"),
      *             @OA\Property(property="phone", type="text"),
-     *             @OA\Property(property="adresse", type="date"),
+     *             @OA\Property(property="adresse", type="text"),
      *             @OA\Property(property="password", type="text")
      *         )
      *     ),
@@ -224,6 +228,8 @@ class UserController extends Controller
             // Par exemple, si l'admin oublie d'assigner un rôle, on pourrait lui donner 'client' ou 'user'
             $user->assignRole('admin'); // Ou un autre rôle par défaut si l'admin ne spécifie rien
         }
+
+        Mail::to($user->email)->send(new UserCreatedNotification($user));
 
         return response()->json($user->load('roles', 'permissions'), Response::HTTP_CREATED);
     }
