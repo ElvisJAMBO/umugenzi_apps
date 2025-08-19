@@ -55,12 +55,11 @@ class UserController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name","email","phone","adresse","password"},
+     *             required={"name","email","phone","adresse"},
      *             @OA\Property(property="name", type="text"),
      *             @OA\Property(property="email", type="text"),
      *             @OA\Property(property="phone", type="text"),
-     *             @OA\Property(property="adresse", type="date"),
-     *             @OA\Property(property="password", type="text")
+     *             @OA\Property(property="adresse", type="date")
      *         )
      *     ),
      *     @OA\Response(
@@ -117,12 +116,11 @@ class UserController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name","email","phone","adresse","password"},
+     *             required={"name","email","phone","adresse"},
      *             @OA\Property(property="name", type="text"),
      *             @OA\Property(property="email", type="text"),
      *             @OA\Property(property="phone", type="text"),
-     *             @OA\Property(property="adresse", type="text"),
-     *             @OA\Property(property="password", type="text")
+     *             @OA\Property(property="adresse", type="text")
      *         )
      *     ),
      *     @OA\Response(
@@ -197,12 +195,11 @@ class UserController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name","email","phone","adresse","password"},
+     *             required={"name","email","phone","adresse"},
      *             @OA\Property(property="name", type="text"),
      *             @OA\Property(property="email", type="text"),
      *             @OA\Property(property="phone", type="text"),
-     *             @OA\Property(property="adresse", type="text"),
-     *             @OA\Property(property="password", type="text")
+     *             @OA\Property(property="adresse", type="text")
      *         )
      *     ),
      *     @OA\Response(
@@ -218,7 +215,7 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->phone = $request->phone;
         $user->adresse = $request->adresse;
-        $user->password = Hash::make($request->password);
+        $user->password = Hash::make("Abcd@1234");
         $user->save();
 
         if ($request->has('roles')) {
