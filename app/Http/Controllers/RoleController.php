@@ -46,19 +46,51 @@ class RoleController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/roles",
-     *     summary="Crée nouveau rôle",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name"},
-     *             @OA\Property(property="name", type="text")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Rôle est crée"
-     *     )
+     * path="/api/roles",
+     * summary="Crée un nouveau rôle",
+     * description="Crée un nouveau rôle avec la possibilité de lui attribuer immédiatement des permissions.",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"name"},
+     * @OA\Property(
+     * property="name",
+     * type="string",
+     * description="Le nom du rôle.",
+     * example="rédacteur"
+     * ),
+     * @OA\Property(
+     * property="permissions",
+     * type="array",
+     * @OA\Items(
+     * type="string",
+     * example="voir article"
+     * ),
+     * description="Un tableau de noms de permissions à attribuer au rôle."
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Rôle créé avec succès",
+     * @OA\JsonContent(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="rédacteur"),
+     * @OA\Property(property="guard_name", type="string", example="web"),
+     * @OA\Property(
+     * property="permissions",
+     * type="array",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=101),
+     * @OA\Property(property="name", type="string", example="voir article")
+     * )
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Erreur de validation. Le nom du rôle peut déjà exister ou les permissions ne sont pas valides.",
+     * )
      * )
      */
     public function store(Request $request)
@@ -160,6 +192,37 @@ class RoleController extends Controller
      * Assign a role to a user.
      * Cette méthode n'est pas standard pour un contrôleur de ressource, mais utile pour l'administration.
      */
+
+    /**
+     * @OA\Post(
+     * path="/api/users/assign-role",
+     * summary="Assigne un rôle à un utilisateur",
+     * description="Cette fonction assigne un rôle existant à un utilisateur spécifié par son ID.",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"user_id", "role_name"},
+     * @OA\Property(property="user_id", type="integer", example=1),
+     * @OA\Property(property="role_name", type="string", example="admin")
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Rôle assigné avec succès",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Rôle assigné avec succès")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Utilisateur ou Rôle non trouvé"
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Erreur de validation",
+     * )
+     * )
+     */
     public function assignRoleToUser(Request $request)
     {
         $request->validate([
@@ -176,6 +239,37 @@ class RoleController extends Controller
     /**
      * Revoke a role from a user.
      * Cette méthode n'est pas standard pour un contrôleur de ressource, mais utile pour l'administration.
+     */
+
+    /**
+     * @OA\Post(
+     * path="/api/users/revoke-role",
+     * summary="Révoque un rôle d'un utilisateur",
+     * description="Cette fonction retire un rôle existant d'un utilisateur spécifié par son ID.",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"user_id", "role_name"},
+     * @OA\Property(property="user_id", type="integer", example=1),
+     * @OA\Property(property="role_name", type="string", example="admin")
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Rôle révoqué avec succès",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Rôle révoqué avec succès")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Utilisateur ou Rôle non trouvé"
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Erreur de validation"
+     * )
+     * )
      */
     public function revokeRoleFromUser(Request $request)
     {

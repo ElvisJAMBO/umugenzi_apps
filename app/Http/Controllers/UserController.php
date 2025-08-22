@@ -234,24 +234,48 @@ class UserController extends Controller
      */
     public function storeAdmin(Request $request)
     {
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->phone;
-        $user->adresse = $request->adresse;
-        $user->password = Hash::make("Abcd@1234");
-        $user->save();
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users',
+            'phone' => 'nullable|string',
+            'adresse' => 'nullable|string',
+            'roles' => 'nullable|array', // Le champ 'roles' est optionnel et doit être un tableau
+        ]);
 
-        if ($request->has('roles')) {
-            $user->syncRoles($request->roles); // Assigne les rôles spécifiés
-        } else {
-            // Si aucun rôle n'est spécifié par l'admin, on peut choisir un rôle par défaut ici aussi
-            // Par exemple, si l'admin oublie d'assigner un rôle, on pourrait lui donner 'client' ou 'user'
-            $user->assignRole('admin'); // Ou un autre rôle par défaut si l'admin ne spécifie rien
+        try {
+            $user = new User();
+            $user->name = $validatedData['name'];
+            $user->email = $validatedData['email'];
+            $user->phone = $validatedData['phone'];
+            $user->adresse = $validatedData['adresse'];
+            $user->password = Hash::make("Abcd@1234");
+            $user->save();
+
+            // Gestion des rôles
+            if (isset($validatedData['roles'])) {
+                $user->syncRoles($validatedData['roles']);
+            } else {
+                $user->assignRole('admin');
+            }
+
+            // Envoi de l'e-mail
+            Mail::to($user->email)->send(new UserCreatedNotification($user));
+
+            // Retourne la réponse en JSON avec les relations chargées
+            return response()->json($user->load('roles', 'permissions'), Response::HTTP_CREATED);
+
+        } catch (\Exception $e) {
+            // En cas d'erreur, logez l'exception pour la déboguer
+            // Et supprimez l'utilisateur si une erreur s'est produite après sa création
+            if (isset($user)) {
+                $user->delete();
+            }
+
+            // Retourne une réponse d'erreur
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de la création de l\'utilisateur.',
+                'error' => $e->getMessage() // À utiliser seulement en mode développement
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        Mail::to($user->email)->send(new UserCreatedNotification($user));
-
-        return response()->json($user->load('roles', 'permissions'), Response::HTTP_CREATED);
     }
 }

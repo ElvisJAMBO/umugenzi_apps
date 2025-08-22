@@ -710,7 +710,8 @@
                 }
             },
             "post": {
-                "summary": "Crée nouveau rôle",
+                "summary": "Crée un nouveau rôle",
+                "description": "Crée un nouveau rôle avec la possibilité de lui attribuer immédiatement des permissions.",
                 "operationId": "4a563842fbfcad237f63da43065fca3d",
                 "requestBody": {
                     "required": true,
@@ -722,7 +723,17 @@
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "text"
+                                        "description": "Le nom du rôle.",
+                                        "type": "string",
+                                        "example": "rédacteur"
+                                    },
+                                    "permissions": {
+                                        "description": "Un tableau de noms de permissions à attribuer au rôle.",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "voir article"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -732,7 +743,47 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Rôle est crée"
+                        "description": "Rôle créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "rédacteur"
+                                        },
+                                        "guard_name": {
+                                            "type": "string",
+                                            "example": "web"
+                                        },
+                                        "permissions": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 101
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "voir article"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation. Le nom du rôle peut déjà exister ou les permissions ne sont pas valides."
                     }
                 }
             }
@@ -791,6 +842,116 @@
                 "responses": {
                     "204": {
                         "description": "Rôle est supprimé"
+                    }
+                }
+            }
+        },
+        "/api/users/assign-role": {
+            "post": {
+                "summary": "Assigne un rôle à un utilisateur",
+                "description": "Cette fonction assigne un rôle existant à un utilisateur spécifié par son ID.",
+                "operationId": "5e822bff2cf3178af12a956baf806687",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "role_name"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "role_name": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Rôle assigné avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Rôle assigné avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Utilisateur ou Rôle non trouvé"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/users/revoke-role": {
+            "post": {
+                "summary": "Révoque un rôle d'un utilisateur",
+                "description": "Cette fonction retire un rôle existant d'un utilisateur spécifié par son ID.",
+                "operationId": "91fde2a579f4a5f750c8c7f090b98af6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "role_name"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "role_name": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Rôle révoqué avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Rôle révoqué avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Utilisateur ou Rôle non trouvé"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
                     }
                 }
             }
