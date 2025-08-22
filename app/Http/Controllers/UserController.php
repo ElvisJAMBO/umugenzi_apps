@@ -218,8 +218,16 @@ class UserController extends Controller
         $user->password = Hash::make("Abcd@1234");
         $user->save();
 
-        
+        if ($request->has('roles')) {
+            $user->syncRoles($request->roles); // Assigne les rôles spécifiés
+        } else {
+            // Si aucun rôle n'est spécifié par l'admin, on peut choisir un rôle par défaut ici aussi
+            // Par exemple, si l'admin oublie d'assigner un rôle, on pourrait lui donner 'client' ou 'user'
+            $user->assignRole('admin'); // Ou un autre rôle par défaut si l'admin ne spécifie rien
+        }
 
-        return response()->json($user);
+        Mail::to($user->email)->send(new UserCreatedNotification($user));
+
+        return response()->json($user->load('roles', 'permissions'), Response::HTTP_CREATED);
     }
 }
