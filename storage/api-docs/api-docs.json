@@ -15,7 +15,8 @@
     "paths": {
         "/api/login": {
             "post": {
-                "summary": "Login a user",
+                "summary": "Connecte un utilisateur",
+                "description": "Authentifie un utilisateur avec son email et son mot de passe et retourne un jeton d'accès et l'objet utilisateur avec ses rôles.",
                 "operationId": "3673edffcdc18c06ac5aef5e2219d774",
                 "requestBody": {
                     "required": true,
@@ -28,10 +29,14 @@
                                 ],
                                 "properties": {
                                     "email": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "utilisateur@exemple.com"
                                     },
                                     "password": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "motdepasse123"
                                     }
                                 },
                                 "type": "object"
@@ -41,13 +46,49 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Login successful",
+                        "description": "Connexion réussie",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "token": {
+                                            "description": "Jeton d'authentification pour les requêtes API.",
                                             "type": "string"
+                                        },
+                                        "user": {
+                                            "description": "Les informations de l'utilisateur.",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Nom de l'utilisateur"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "utilisateur@exemple.com"
+                                                },
+                                                "roles": {
+                                                    "description": "Les rôles assignés à l'utilisateur.",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "admin"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -56,10 +97,23 @@
                         }
                     },
                     "401": {
-                        "description": "Invalid credentials"
+                        "description": "Identifiants invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Les identifiants fournis sont incorrects."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "500": {
-                        "description": "Could not create token"
+                        "description": "Erreur interne du serveur. Impossible de créer le jeton."
                     }
                 }
             }

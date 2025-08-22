@@ -15,31 +15,52 @@ class LoginController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/login",
-     *     summary="Login a user",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"email", "password"},
-     *             @OA\Property(property="email", type="string"),
-     *             @OA\Property(property="password", type="string")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Login successful",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="token", type="string")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Invalid credentials"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Could not create token"
-     *     )
+     * path="/api/login",
+     * summary="Connecte un utilisateur",
+     * description="Authentifie un utilisateur avec son email et son mot de passe et retourne un jeton d'accès et l'objet utilisateur avec ses rôles.",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"email", "password"},
+     * @OA\Property(property="email", type="string", format="email", example="utilisateur@exemple.com"),
+     * @OA\Property(property="password", type="string", format="password", example="motdepasse123")
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Connexion réussie",
+     * @OA\JsonContent(
+     * @OA\Property(property="token", type="string", description="Jeton d'authentification pour les requêtes API."),
+     * @OA\Property(
+     * property="user",
+     * type="object",
+     * description="Les informations de l'utilisateur.",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Nom de l'utilisateur"),
+     * @OA\Property(property="email", type="string", example="utilisateur@exemple.com"),
+     * @OA\Property(
+     * property="roles",
+     * type="array",
+     * description="Les rôles assignés à l'utilisateur.",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="admin")
+     * )
+     * )
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Identifiants invalides",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Les identifiants fournis sont incorrects.")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Erreur interne du serveur. Impossible de créer le jeton."
+     * )
      * )
      */
     public function login(Request $request)
@@ -62,7 +83,7 @@ class LoginController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user' => $user,
+            'user' => $user->load('roles'), // Charger la relation des rôles
         ]);
     }
 
