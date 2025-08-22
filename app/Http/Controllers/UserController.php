@@ -59,7 +59,7 @@ class UserController extends Controller
      *             @OA\Property(property="name", type="text"),
      *             @OA\Property(property="email", type="text"),
      *             @OA\Property(property="phone", type="text"),
-     *             @OA\Property(property="adresse", type="date")
+     *             @OA\Property(property="adresse", type="text")
      *         )
      *     ),
      *     @OA\Response(
@@ -218,16 +218,8 @@ class UserController extends Controller
         $user->password = Hash::make("Abcd@1234");
         $user->save();
 
-        if ($request->has('roles')) {
-            $user->syncRoles($request->roles); // Assigne les rôles spécifiés
-        } else {
-            // Si aucun rôle n'est spécifié par l'admin, on peut choisir un rôle par défaut ici aussi
-            // Par exemple, si l'admin oublie d'assigner un rôle, on pourrait lui donner 'client' ou 'user'
-            $user->assignRole('admin'); // Ou un autre rôle par défaut si l'admin ne spécifie rien
-        }
+        
 
-        Mail::to($user->email)->send(new UserCreatedNotification($user));
-
-        return response()->json($user->load('roles', 'permissions'), Response::HTTP_CREATED);
+        return response()->json($user);
     }
 }
