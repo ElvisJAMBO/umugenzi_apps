@@ -23,6 +23,17 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    /**
+     * @OA\Get(
+     * path="/api/roles",
+     * summary="Récupérer toutes les rôles",
+     * @OA\Response(
+     * response=200,
+     * description="Liste des rôles",
+     * )
+     * )
+     */
     public function index()
     {
         $roles = Role::with('permissions')->get(); // Inclut les permissions associées à chaque rôle
@@ -31,6 +42,24 @@ class RoleController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     */
+
+    /**
+     * @OA\Post(
+     *     path="/api/roles",
+     *     summary="Crée nouveau rôle",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="text")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Rôle est crée"
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -60,6 +89,30 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+    /**
+     * @OA\Put(
+     *     path="/api/roles/{id}",
+     *     summary="Modifier rôle",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="text")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Rôle est mise à jour"
+     *     )
+     * )
+     */
     public function update(Request $request, Role $role)
     {
         $request->validate([
@@ -79,6 +132,23 @@ class RoleController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     */
+
+    /**
+     * @OA\Delete(
+     *     path="/api/roles/{id}",
+     *     summary="Supprimer le rôle",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Rôle est supprimé"
+     *     )
+     * )
      */
     public function destroy(Role $role)
     {
