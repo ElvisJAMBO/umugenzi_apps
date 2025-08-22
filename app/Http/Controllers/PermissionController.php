@@ -21,6 +21,17 @@ class PermissionController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    /**
+     * @OA\Get(
+     * path="/api/permissions",
+     * summary="Récupérer toutes les permissions",
+     * @OA\Response(
+     * response=200,
+     * description="Liste des permissions",
+     * )
+     * )
+     */
     public function index()
     {
         $permissions = Permission::all();
@@ -29,6 +40,24 @@ class PermissionController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     */
+
+    /**
+     * @OA\Post(
+     *     path="/api/permissions",
+     *     summary="Crée nouvelle permission",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="text")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Permission est crée"
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -51,6 +80,30 @@ class PermissionController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+    /**
+     * @OA\Put(
+     *     path="/api/permissions/{id}",
+     *     summary="Modifier permission",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="text")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Permission est mise à jour"
+     *     )
+     * )
+     */
     public function update(Request $request, Permission $permission)
     {
         $request->validate([
@@ -63,6 +116,23 @@ class PermissionController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     */
+
+    /**
+     * @OA\Delete(
+     *     path="/api/permissions/{id}",
+     *     summary="Supprimer la permission",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Permission est supprimé"
+     *     )
+     * )
      */
     public function destroy(Permission $permission)
     {
