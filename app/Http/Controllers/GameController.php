@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\Groupe;
 use Illuminate\Http\Request;
 
 class GameController extends Controller
@@ -138,5 +139,45 @@ class GameController extends Controller
             'status' => 'success',
             'message' => 'Super'
         ]);
+    }
+
+
+    /**
+     * @OA\Get(
+     * path="/api/groupes/{groupe}/games",
+     * summary="Récupérer tous les joueurs d'un groupe",
+     * description="Récupère la liste de tous les joueurs associés à un groupe spécifique.",
+     * @OA\Parameter(
+     * name="groupe",
+     * in="path",
+     * required=true,
+     * description="ID du groupe",
+     * @OA\Schema(
+     * type="integer"
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Liste des joueurs du groupe",
+     * @OA\JsonContent(
+     * type="array",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=101),
+     * @OA\Property(property="nom", type="string", example="Nom du joueur"),
+     * @OA\Property(property="groupe_id", type="integer", example=1)
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Groupe non trouvé"
+     * )
+     * )
+     */
+    public function gameByGroup(Groupe $groupe)
+    {
+        $games = Game::where('groupe_id', $groupe->id)->get();
+
+        return response()->json($games);
     }
 }

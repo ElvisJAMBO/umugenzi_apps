@@ -536,6 +536,56 @@
                 }
             }
         },
+        "/api/groupes/{groupe}/games": {
+            "get": {
+                "summary": "Récupérer tous les joueurs d'un groupe",
+                "description": "Récupère la liste de tous les joueurs associés à un groupe spécifique.",
+                "operationId": "4d7ebdc9f0b83e66aa9aed8598360de9",
+                "parameters": [
+                    {
+                        "name": "groupe",
+                        "in": "path",
+                        "description": "ID du groupe",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des joueurs du groupe",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 101
+                                            },
+                                            "nom": {
+                                                "type": "string",
+                                                "example": "Nom du joueur"
+                                            },
+                                            "groupe_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Groupe non trouvé"
+                    }
+                }
+            }
+        },
         "/api/groupes": {
             "get": {
                 "summary": "Récupérer toutes les groupes",
