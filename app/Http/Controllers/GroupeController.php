@@ -67,8 +67,64 @@ class GroupeController extends Controller
     /**
      * Display the specified resource.
      */
+
+    /**
+     * @OA\Get(
+     * path="/api/groupes/{groupe}",
+     * summary="Récupérer un groupe et ses joueurs",
+     * description="Récupère les détails d'un groupe spécifique avec tous les joueurs qui lui sont associés.",
+     * @OA\Parameter(
+     * name="groupe",
+     * in="path",
+     * required=true,
+     * description="ID du groupe",
+     * @OA\Schema(
+     * type="integer"
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Détails du groupe et de ses joueurs",
+     * @OA\JsonContent(
+     * type="object",
+     * @OA\Property(
+     * property="id",
+     * type="integer",
+     * example=1
+     * ),
+     * @OA\Property(
+     * property="nom",
+     * type="string",
+     * example="Nom du groupe"
+     * ),
+     * @OA\Property(
+     * property="games",
+     * type="array",
+     * @OA\Items(
+     * type="object",
+     * @OA\Property(
+     * property="id",
+     * type="integer",
+     * example=101
+     * ),
+     * @OA\Property(
+     * property="titre",
+     * type="string",
+     * example="Nom du joueur"
+     * )
+     * )
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Groupe non trouvé"
+     * )
+     * )
+     */
     public function show(Groupe $groupe)
     {
+        $groupe->load('games');
         return response()->json($groupe);
     }
 

@@ -574,6 +574,65 @@
                 }
             }
         },
+        "/api/groupes/{groupe}": {
+            "get": {
+                "summary": "Récupérer un groupe et ses joueurs",
+                "description": "Récupère les détails d'un groupe spécifique avec tous les joueurs qui lui sont associés.",
+                "operationId": "20ee486cd52ade01539f8bd46ef6c98a",
+                "parameters": [
+                    {
+                        "name": "groupe",
+                        "in": "path",
+                        "description": "ID du groupe",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails du groupe et de ses joueurs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "nom": {
+                                            "type": "string",
+                                            "example": "Nom du groupe"
+                                        },
+                                        "games": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 101
+                                                    },
+                                                    "titre": {
+                                                        "type": "string",
+                                                        "example": "Nom du joueur"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Groupe non trouvé"
+                    }
+                }
+            }
+        },
         "/api/groupes/{id}": {
             "put": {
                 "summary": "Modifier groupe",
