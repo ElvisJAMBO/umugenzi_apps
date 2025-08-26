@@ -60,7 +60,8 @@ class GroupeController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Group Created'
+            'message' => 'Group Created',
+            'data' => $groupe
         ]);
     }
 
