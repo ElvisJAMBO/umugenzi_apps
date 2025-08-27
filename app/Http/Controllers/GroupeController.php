@@ -13,15 +13,42 @@ class GroupeController extends Controller
      * @OA\Get(
      * path="/api/groupes",
      * summary="Récupérer toutes les groupes",
+     * @OA\Parameter(
+     * name="q",
+     * in="query",
+     * description="Terme de recherche pour filtrer les groupes par nom",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
      * @OA\Response(
      * response=200,
-     * description="Liste des groupes",
+     * description="Liste des groupes paginée",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="nom", type="string", example="Groupe A"),
+     * )
+     * ),
+     * @OA\Property(property="links", type="object"),
+     * @OA\Property(property="meta", type="object")
+     * )
      * )
      * )
      */
     public function index()
     {
-        $groupes = Groupe::get();
+        $query = request('q'); 
+
+        $groupes = Groupe::query();
+
+        if ($query) {
+            $groupes->where('name', 'like', "%{$query}%");
+        }
+
+        $groupes = $groupes->paginate(10);
 
         return response()->json($groupes);
     }
