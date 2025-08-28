@@ -39,19 +39,19 @@ class GroupeController extends Controller
      * )
      */
     public function index()
-    {
-        $query = request('q'); 
+{
+    $query = request('q');
 
-        $groupes = Groupe::query();
+    $groupes = Groupe::query();
 
-        if ($query) {
-            $groupes->where('name', 'like', "%{$query}%");
-        }
-
-        $groupes = $groupes->orderBy('id', 'desc')->paginate(10);
-
-        return response()->json($groupes);
+    if ($query) {
+        $groupes->where('name', 'like', "%{$query}%");
     }
+
+    $groupes = $groupes->orderBy('id', 'desc')->paginate(10);
+
+    return response()->json($groupes);
+}
 
     /**
      * Show the form for creating a new resource.
