@@ -48,7 +48,7 @@ class GroupeController extends Controller
             $groupes->where('name', 'like', "%{$query}%");
         }
 
-        $groupes = $groupes->paginate(10);
+        $groupes = $groupes->orderBy('id', 'desc')->paginate(10);
 
         return response()->json($groupes);
     }
