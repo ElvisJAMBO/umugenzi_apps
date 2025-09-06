@@ -74,7 +74,7 @@ class EvenementController extends Controller
             
         }
 
-        $evenement->image = $imagaPath;
+        $evenement->image = $request->image;
         $evenement->user_id = $request->user_id;
         $evenement->categorie_id = $request->categorie_id;
         $evenement->save();
