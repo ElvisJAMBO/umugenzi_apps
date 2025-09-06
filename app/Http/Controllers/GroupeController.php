@@ -6,6 +6,7 @@ use App\Models\Groupe;
 use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Twilio\Rest\Client;
 
 class GroupeController extends Controller
 {
@@ -39,19 +40,19 @@ class GroupeController extends Controller
      * )
      */
     public function index()
-{
-    $query = request('q');
+    {
+        $query = request('q');
 
-    $groupes = Groupe::query();
+        $groupes = Groupe::query();
 
-    if ($query) {
-        $groupes->where('name', 'like', "%{$query}%");
+        if ($query) {
+            $groupes->where('name', 'like', "%{$query}%");
+        }
+
+        $groupes = $groupes->latest()->paginate(10);
+
+        return response()->json($groupes);
     }
-
-    $groupes = $groupes->latest()->paginate(10);
-
-    return response()->json($groupes);
-}
 
     /**
      * Show the form for creating a new resource.
@@ -245,10 +246,17 @@ class GroupeController extends Controller
      */
     public function effectuerTirageAuSort($groupeId)
     {
-        $groupe = Groupe::with('games')->findOrFail($groupeId);
-        $games = $groupe->games->pluck('candidat')->toArray();
+        $groupe = Groupe::with('games.gift')->findOrFail($groupeId);
+        $games = $groupe->games->all();
 
-        // 1. Vérification minimale : il faut au moins deux joueurs
+        $candidats = [];
+        foreach ($games as $game) {
+            $candidats[$game->candidat] = [
+                'phone' => $game->phone,
+                'gift_name' => optional($game->gift)->nom ?? 'un cadeau inconnu'
+            ];
+        }
+
         if (count($games) < 2) {
             return response()->json([
                 'message' => 'Il faut au moins deux joueurs pour effectuer un tirage au sort.',
@@ -262,30 +270,23 @@ class GroupeController extends Controller
 
         do {
             $tirages = [];
-            $joueursDisponibles = $games;
-            $joueursCiblesPotentielles = Arr::shuffle($games);
-
+            $joueursDisponibles = array_keys($candidats);
+            $joueursCiblesPotentielles = Arr::shuffle($joueursDisponibles);
             $reussite = true;
-
             foreach ($joueursDisponibles as $joueur) {
                 $cibleTrouvee = false;
                 $tentativesCiblePourJoueur = 0;
                 $maxTentativesCiblePourJoueur = count($joueursCiblesPotentielles) * 2;
-
                 while (!$cibleTrouvee && count($joueursCiblesPotentielles) > 0 && $tentativesCiblePourJoueur < $maxTentativesCiblePourJoueur) {
                     $randomIndex = array_rand($joueursCiblesPotentielles);
                     $cible = $joueursCiblesPotentielles[$randomIndex];
-
-                    // Condition principale : le joueur ne peut pas tirer son propre nom
                     if ($joueur !== $cible) {
                         $tirages[$joueur] = $cible;
-                        // On retire la cible de la liste des cibles potentielles pour qu'elle ne soit pas réutilisée
                         array_splice($joueursCiblesPotentielles, $randomIndex, 1);
                         $cibleTrouvee = true;
                     }
                     $tentativesCiblePourJoueur++;
                 }
-
                 if (!$cibleTrouvee) {
                     $reussite = false;
                     break;
@@ -294,16 +295,44 @@ class GroupeController extends Controller
             $tentativeActuelle++;
         } while (!$reussite && $tentativeActuelle < $tentativesMax);
 
-
         if (!$reussite) {
             return response()->json([
                 'message' => 'Impossible de générer un tirage valide après plusieurs tentatives. Veuillez réessayer.',
                 'code' => 500
             ], 500);
         }
+        
+        // Initialisation et envoi des notifications WhatsApp
+        $sid = getenv("TWILIO_SID");
+        $token = getenv("TWILIO_TOKEN");
+        $sender = "whatsapp:" . getenv("TWILIO_PHONE"); 
+        $twilio = new Client($sid, $token);
+
+        foreach ($tirages as $joueur => $cible) {
+            $phoneNumber = $candidats[$joueur]['phone'];
+            $cibleGiftName = $candidats[$cible]['gift_name'];
+
+            // Créer le message
+            $messageContent = "🎉 Félicitations, " . $joueur . " ! 🎉\n";
+            $messageContent .= "Vous avez tiré au sort le nom de : " . $cible . ".\n";
+            $messageContent .= "Le cadeau choisi par " . $cible . " est : " . $cibleGiftName . ".\n";
+            $messageContent .= "Bonne chance dans le jeu !";
+            
+            try {
+                $twilio->messages
+                       ->create("whatsapp:" . $phoneNumber,
+                           [
+                               "body" => $messageContent,
+                               "from" => $sender
+                           ]
+                       );
+            } catch (\Exception $e) {
+                \Log::error("Erreur lors de l'envoi du message à " . $phoneNumber . ": " . $e->getMessage());
+            }
+        }
 
         return response()->json([
-            'message' => 'Tirage au sort effectué avec succès.',
+            'message' => 'Tirage au sort effectué avec succès et notifications envoyées.',
             'tirages' => $tirages,
             'code' => 200
         ]);

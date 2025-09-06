@@ -452,13 +452,21 @@
                             "schema": {
                                 "required": [
                                     "groupe_id",
-                                    "candidat"
+                                    "candidat",
+                                    "phone",
+                                    "gift_id"
                                 ],
                                 "properties": {
                                     "groupe_id": {
                                         "type": "text"
                                     },
                                     "candidat": {
+                                        "type": "text"
+                                    },
+                                    "phone": {
+                                        "type": "text"
+                                    },
+                                    "gift_id": {
                                         "type": "text"
                                     }
                                 },
@@ -495,13 +503,21 @@
                             "schema": {
                                 "required": [
                                     "groupe_id",
-                                    "candidat"
+                                    "candidat",
+                                    "phone",
+                                    "gift_id"
                                 ],
                                 "properties": {
                                     "groupe_id": {
                                         "type": "text"
                                     },
                                     "candidat": {
+                                        "type": "text"
+                                    },
+                                    "phone": {
+                                        "type": "text"
+                                    },
+                                    "gift_id": {
                                         "type": "text"
                                     }
                                 },
@@ -582,6 +598,105 @@
                     },
                     "404": {
                         "description": "Groupe non trouvé"
+                    }
+                }
+            }
+        },
+        "/api/gifts": {
+            "get": {
+                "summary": "Récupérer toutes les cadeaux",
+                "operationId": "4befadf53537a7ab77d7b731ecafcfee",
+                "responses": {
+                    "200": {
+                        "description": "Liste des cadeaux"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Ajouter un cadeau",
+                "operationId": "84cc149646671c5808f7cecd619bbd0d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cadeau est crée"
+                    }
+                }
+            }
+        },
+        "/api/gifts/{id}": {
+            "put": {
+                "summary": "Mettre à jour le cadeau",
+                "operationId": "3f9d080ff64fcd36e707fa4f8f675be8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cadeau est mise à jour"
+                    },
+                    "404": {
+                        "description": "Gift not found"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Supprimer le cadeau",
+                "operationId": "d36bc890268318f32be19cc32e70cd46",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Cadeau est supprimé"
                     }
                 }
             }

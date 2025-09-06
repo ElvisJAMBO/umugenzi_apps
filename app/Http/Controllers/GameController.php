@@ -40,9 +40,11 @@ class GameController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"groupe_id", "candidat"},
+     *             required={"groupe_id", "candidat", "phone", "gift_id"},
      *             @OA\Property(property="groupe_id", type="text"),
-     *             @OA\Property(property="candidat", type="text")
+     *             @OA\Property(property="candidat", type="text"),
+     *             @OA\Property(property="phone", type="text"),
+     *             @OA\Property(property="gift_id", type="text")
      *         )
      *     ),
      *     @OA\Response(
@@ -56,6 +58,8 @@ class GameController extends Controller
         $game = new Game();
         $game->groupe_id = $request->groupe_id;
         $game->candidat = $request->candidat;
+        $game->phone = $request->phone;
+        $game->gift_id = $request->gift_id;
         $game->save();
 
         return response()->json([
@@ -93,9 +97,11 @@ class GameController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"groupe_id", "candidat"},
+     *             required={"groupe_id", "candidat", "phone", "gift_id"},
      *             @OA\Property(property="groupe_id", type="text"),
-     *             @OA\Property(property="candidat", type="text")
+     *             @OA\Property(property="candidat", type="text"),
+     *             @OA\Property(property="phone", type="text"),
+     *             @OA\Property(property="gift_id", type="text")
      *         )
      *     ),
      *     @OA\Response(
@@ -108,6 +114,8 @@ class GameController extends Controller
     {
         $game->groupe_id = $request->groupe_id;
         $game->candidat = $request->candidat;
+        $game->phone = $request->phone;
+        $game->gift_id = $request->gift_id;
         $game->save();
 
         return response()->json([

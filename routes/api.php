@@ -14,6 +14,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\GiftController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,8 @@ Route::apiResource('users', UserController::class);
 Route::post('storeAdmin', [UserController::class, 'storeAdmin']);
 Route::put('update-user/{user}', [ProfileController::class, 'update']);
 
+//Route pour les cadeaux
+Route::apiResource('gifts', GiftController::class);
     
 
 
