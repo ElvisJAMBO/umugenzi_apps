@@ -69,12 +69,13 @@ class EvenementController extends Controller
         $evenement->date_event = $request->date_event;
         $evenement->heure = $request->heure;
 
-        if($request->hasFile('image')) {
-            $imagaPath = $request->file('image')->store('image_events', 'public');
-            
-        }
 
-        $evenement->image = $request->image;
+        $Photo = $request->image;
+        $filePhoto = time().'.'.$Photo->getClientOriginalName();
+        
+        $request->image->move('image_events',$filePhoto);
+
+        $evenement->image = $filePhoto;
         $evenement->user_id = $request->user_id;
         $evenement->categorie_id = $request->categorie_id;
         $evenement->save();
