@@ -156,4 +156,66 @@ class LoginController extends Controller
 
         return response()->json(['message' => 'Compte créé avec succès!', 'user' => $user->load('roles'), 'token' => $token], 201);
     }
+
+
+    /**
+     * @OA\Post(
+     *     path="/api/register-manager",
+     *     summary="Register a new manager",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "phone", "adresse", "password"},
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string"),
+     *             @OA\Property(property="phone", type="string"),
+     *             @OA\Property(property="adresse", type="string"),
+     *             @OA\Property(property="password", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Manager registered successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation error"
+     *     )
+     * )
+     */
+    public function registerManager(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phone' => 'required|string|max:255|unique:users,phone',
+            'adresse' => 'required|string|max:255',
+            'photo' => 'nullable|string|max:255',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'adresse' => $request->adresse,
+            'photo' => $request->photo,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Assigner le rôle 'client' par défaut
+        $managerRole = Role::where('name', 'manager')->first();
+        if ($managerRole) {
+            $user->assignRole($managerRole);
+        } else {
+            // Gérer le cas où le rôle 'client' n'existe pas (log, créer, etc.)
+            // Pour l'instant, nous allons juste loguer une erreur.
+            \Log::error("Le rôle 'manager' n'existe pas lors de l'enregistrement de l'utilisateur.");
+        }
+
+        // Vous pouvez choisir de générer un token ici ou laisser l'utilisateur se connecter après l'enregistrement
+        $token = $user->createToken('registration_token')->plainTextToken;
+
+        return response()->json(['message' => 'Compte créé avec succès!', 'user' => $user->load('roles'), 'token' => $token], 201);
+    }
 }

@@ -29,6 +29,7 @@ use App\Http\Controllers\GiftController;
 
 
 Route::post('/register', [LoginController::class, 'register']);
+Route::post('/register-manager', [LoginController::class, 'registerManager']);
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::middleware('auth:sanctum')->group(function () {
     // Vos routes API protégées par Sanctum iront ici
