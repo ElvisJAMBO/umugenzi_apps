@@ -16,9 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('groupe_id');
             $table->foreign('groupe_id')->references('id')->on('groupes');
             $table->string('candidat');
-            $table->unsignedBigInteger('gift_id');
-            $table->foreign('gift_id')->references('id')->on('gifts');
-            $table->string('phone');
             $table->timestamps();
         });
     }
