@@ -334,12 +334,12 @@
                 }
             },
             "post": {
-                "summary": "Ajouter un evenement",
+                "summary": "Ajouter un evenement et ses types de tickets",
                 "operationId": "6cc07eed54d06683e60f49ae4d921be1",
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "titre",
@@ -349,33 +349,48 @@
                                     "heure",
                                     "image",
                                     "user_id",
-                                    "categorie_id"
+                                    "categorie_id",
+                                    "typetickets"
                                 ],
                                 "properties": {
                                     "titre": {
-                                        "type": "text"
+                                        "description": "Titre de l'événement",
+                                        "type": "string"
                                     },
                                     "description": {
-                                        "type": "text"
+                                        "description": "Description de l'événement",
+                                        "type": "string"
                                     },
                                     "place": {
-                                        "type": "text"
+                                        "description": "Lieu de l'événement",
+                                        "type": "string"
                                     },
                                     "date_event": {
+                                        "description": "Date de l'événement (YYYY-MM-DD)",
                                         "type": "string",
                                         "format": "date"
                                     },
                                     "heure": {
-                                        "type": "text"
+                                        "description": "Heure de l'événement",
+                                        "type": "string"
                                     },
                                     "image": {
-                                        "type": "text"
+                                        "description": "Fichier image",
+                                        "type": "string",
+                                        "format": "binary"
                                     },
                                     "user_id": {
-                                        "type": "text"
+                                        "description": "ID de l'utilisateur",
+                                        "type": "integer"
                                     },
                                     "categorie_id": {
-                                        "type": "text"
+                                        "description": "ID de la catégorie",
+                                        "type": "integer"
+                                    },
+                                    "typetickets": {
+                                        "description": "JSON stringified array of ticket types.",
+                                        "type": "string",
+                                        "example": "[{\"nom\":\"VIP\",\"prix\":150.0,\"quantite\":10},{\"nom\":\"Standard\",\"prix\":50.0,\"quantite\":100}]"
                                     }
                                 },
                                 "type": "object"
@@ -385,7 +400,13 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Evenement es crée"
+                        "description": "Événement et tickets créés avec succès."
+                    },
+                    "422": {
+                        "description": "Données de validation manquantes ou invalides."
+                    },
+                    "500": {
+                        "description": "Erreur serveur lors de la création."
                     }
                 }
             }

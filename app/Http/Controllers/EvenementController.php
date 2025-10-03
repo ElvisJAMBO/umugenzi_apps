@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Evenement;
+use App\Models\Typeticket;
+use App\Models\Ticket;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class EvenementController extends Controller
@@ -36,54 +39,120 @@ class EvenementController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/evenements",
-     *     summary="Ajouter un evenement",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"titre","description","place","date_event","heure","image","user_id","categorie_id"},
-     *             @OA\Property(property="titre", type="text"),
-     *             @OA\Property(property="description", type="text"),
-     *             @OA\Property(property="place", type="text"),
-     *             @OA\Property(property="date_event", type="date"),
-     *             @OA\Property(property="heure", type="text"),
-     *             @OA\Property(property="image", type="text"),
-     *             @OA\Property(property="user_id", type="text"),
-     *             @OA\Property(property="categorie_id", type="text")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Evenement es crée"
-     *     )
+     * path="/api/evenements",
+     * summary="Ajouter un evenement et ses types de tickets",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\MediaType(
+     * mediaType="multipart/form-data",
+     * @OA\Schema(
+     * required={"titre", "description", "place", "date_event", "heure", "image", "user_id", "categorie_id", "typetickets"},
+     * @OA\Property(property="titre", type="string", description="Titre de l'événement"),
+     * @OA\Property(property="description", type="string", description="Description de l'événement"),
+     * @OA\Property(property="place", type="string", description="Lieu de l'événement"),
+     * @OA\Property(property="date_event", type="string", format="date", description="Date de l'événement (YYYY-MM-DD)"),
+     * @OA\Property(property="heure", type="string", description="Heure de l'événement"),
+     * @OA\Property(property="image", type="string", format="binary", description="Fichier image"),
+     * @OA\Property(property="user_id", type="integer", description="ID de l'utilisateur"),
+     * @OA\Property(property="categorie_id", type="integer", description="ID de la catégorie"),
+     * @OA\Property(
+     * property="typetickets",
+     * type="string",
+     * description="JSON stringified array of ticket types.",
+     * example="[{""nom"":""VIP"",""prix"":150.0,""quantite"":10},{""nom"":""Standard"",""prix"":50.0,""quantite"":100}]"
+     * )
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Événement et tickets créés avec succès."
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Données de validation manquantes ou invalides."
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Erreur serveur lors de la création."
+     * )
      * )
      */
     public function store(Request $request)
     {
-        $imagaPath = null;
+        // Utilisation d'une transaction pour garantir que toutes les opérations
+        // se terminent avec succès.
+        DB::beginTransaction();
 
-        $evenement = new Evenement();
-        $evenement->titre = $request->titre;
-        $evenement->description = $request->description;
-        $evenement->place = $request->place;
-        $evenement->date_event = $request->date_event;
-        $evenement->heure = $request->heure;
+        try {
+            // Décodage de la chaîne JSON en tableau
+            $typetickets = json_decode($request->input('typetickets'), true);
 
+            // Fusionner le tableau décodé avec le reste de la requête
+            $request->merge(['typetickets' => $typetickets]);
+            
+            $validatedData = $request->validate([
+                'titre' => 'required|string|max:255',
+                'description' => 'required|string',
+                'place' => 'required|string',
+                'date_event' => 'required|date',
+                'heure' => 'required|string',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'user_id' => 'required|integer|exists:users,id',
+                'categorie_id' => 'required|integer|exists:categories,id',
+                'typetickets' => 'required|array',
+                'typetickets.*.nom' => 'required|string|max:255',
+                'typetickets.*.prix' => 'required|numeric|min:0',
+                'typetickets.*.quantite' => 'required|integer|min:1',
+            ]);
 
-        $Photo = $request->image;
-        $filePhoto = time().'.'.$Photo->getClientOriginalName();
-        
-        $request->image->move('image_events',$filePhoto);
+            
+            $evenement = new Evenement();
+            $evenement->titre = $validatedData['titre'];
+            $evenement->description = $validatedData['description'];
+            $evenement->place = $validatedData['place'];
+            $evenement->date_event = $validatedData['date_event'];
+            $evenement->heure = $validatedData['heure'];
 
-        $evenement->image = $filePhoto;
-        $evenement->user_id = $request->user_id;
-        $evenement->categorie_id = $request->categorie_id;
-        $evenement->save();
+            
+            $imageName = time().'.'.$request->image->getClientOriginalExtension();
+            $request->image->move(public_path('image_events'), $imageName);
+            $evenement->image = $imageName;
 
-        return response()->json([
-            'status'=> 'success',
-            'message'=> "Event Created",
-        ]);
+            $evenement->user_id = $validatedData['user_id'];
+            $evenement->categorie_id = $validatedData['categorie_id'];
+            $evenement->save();
+
+            foreach ($validatedData['typetickets'] as $typeticketData) {
+                $typeticket = new Typeticket();
+                $typeticket->nom = $typeticketData['nom'];
+                $typeticket->prix = $typeticketData['prix'];
+                $typeticket->evenement_id = $evenement->id;
+                $typeticket->save();
+
+                $ticket = new Ticket();
+                $ticket->typeticket_id = $typeticket->id;
+                $ticket->quantite = $typeticketData['quantite'];
+                $ticket->save();
+            }
+
+            // Si tout s'est bien passé, on valide la transaction
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Événement et tickets créés avec succès.'
+            ], 201);
+
+        } catch (\Exception $e) {
+            // En cas d'erreur, on annule la transaction
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur lors de la création de l\'événement ou des tickets.',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
