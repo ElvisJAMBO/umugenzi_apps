@@ -49,7 +49,8 @@ class GroupeController extends Controller
             $groupes->where('name', 'like', "%{$query}%");
         }
 
-        $groupes = $groupes->latest()->paginate(10);
+        // Compte le nombre de jeux pour chaque groupe
+        $groupes = $groupes->withCount('games')->latest()->paginate(10);
 
         return response()->json($groupes);
     }
@@ -83,13 +84,13 @@ class GroupeController extends Controller
     {
         $groupe = new Groupe();
         $groupe->name = 'hello';
-        $groupe->user_id = $request->user_id;
+        $groupe->user_id = 1;
         $groupe->save();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Group Created',
-            'data' => $groupe
+            'data' => $groupe,
         ]);
     }
 
