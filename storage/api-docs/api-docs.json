@@ -412,6 +412,25 @@
             }
         },
         "/api/evenements/{id}": {
+            "get": {
+                "summary": "Détailles de l'evenement",
+                "operationId": "8a580ac0db622f34e0deb0f5fb79364b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Détailles de l'evenement"
+                    }
+                }
+            },
             "put": {
                 "summary": "Mise à jour de l'evenement",
                 "operationId": "4c5cc09e979a893b3a326e10e79dc12a",

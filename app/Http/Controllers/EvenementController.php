@@ -156,10 +156,24 @@ class EvenementController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/evenements/{id}",
+     *     summary="Détailles de l'evenement",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Détailles de l'evenement"
+     *     )
+     * )
      */
     public function show(Evenement $evenement)
     {
+        $evenement->load('user', 'category', 'typetickets');
         return response()->json($evenement);
     }
 
