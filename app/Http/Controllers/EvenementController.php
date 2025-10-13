@@ -7,6 +7,7 @@ use App\Models\Typeticket;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class EvenementController extends Controller
 {
@@ -114,10 +115,10 @@ class EvenementController extends Controller
             $evenement->date_event = $validatedData['date_event'];
             $evenement->heure = $validatedData['heure'];
 
-            
-            $imageName = time().'.'.$request->image->getClientOriginalExtension();
-            $request->image->move(public_path('image_events'), $imageName);
-            $evenement->image = $imageName;
+            $Photo = $request->image;
+            $filePhoto = time().'.'.$Photo->getClientOriginalExtension();
+            $request->image->move('image_events',$filePhoto);
+            $evenement->image = $filePhoto;
 
             $evenement->user_id = $validatedData['user_id'];
             $evenement->categorie_id = $validatedData['categorie_id'];
@@ -155,6 +156,73 @@ class EvenementController extends Controller
         }
     }
 
+
+    /**
+     * @OA\Patch(
+     * path="/api/evenements/{id}/validate",
+     * summary="Valider un événement (changer son statut à 1)",
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID de l'événement à valider.",
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Événement validé avec succès.",
+     * @OA\JsonContent(
+     * @OA\Property(property="status", type="string", example="success"),
+     * @OA\Property(property="message", type="string", example="Evenement est validé.")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Événement non trouvé."
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Erreur serveur lors de la validation."
+     * )
+     * )
+     */
+    public function EventValidation($id)
+    {
+        try {
+            $evenement = Evenement::findOrFail($id);
+            
+            if ($evenement->status == 1) {
+                 return response()->json([
+                    'status' => 'info',
+                    'message' => 'L\'événement est déjà validé.'
+                ], 200);
+            }
+
+            // Mise à jour du statut
+            $evenement->statut_validation = 1;
+            $evenement->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Evenement est validé.'
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Événement non trouvé.'
+            ], 404);
+            
+        } catch (\Exception $e) {
+            // Erreur 500 (serveur ou base de données)
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur serveur lors de la validation de l\'événement.',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * @OA\Get(
      *     path="/api/evenements/{id}",
@@ -186,54 +254,161 @@ class EvenementController extends Controller
     }
 
     /**
-     * @OA\Put(
-     *     path="/api/evenements/{id}",
-     *     summary="Mise à jour de l'evenement",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"titre","description","place","date_event","heure","image","user_id","categorie_id"},
-     *             @OA\Property(property="titre", type="text"),
-     *             @OA\Property(property="description", type="text"),
-     *             @OA\Property(property="place", type="text"),
-     *             @OA\Property(property="date_event", type="date"),
-     *             @OA\Property(property="heure", type="text"),
-     *             @OA\Property(property="image", type="text"),
-     *             @OA\Property(property="user_id", type="text"),
-     *             @OA\Property(property="categorie_id", type="text")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Evenement est mise à jour"
-     *     ),
-    *      @OA\Response(
-    *          response=404,
-    *          description="Event not found"
-    *      )
+     * @OA\Post(
+     * path="/api/evenements/{id}",
+     * summary="Mettre à jour un événement existant, son image et ses types de tickets",
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID de l'événement à mettre à jour",
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\MediaType(
+     * mediaType="multipart/form-data",
+     * @OA\Schema(
+     * @OA\Property(property="_method", type="string", default="PUT", description="Champ requis pour simuler la méthode PUT en 'multipart/form-data'"),
+     * * @OA\Property(property="titre", type="string", description="Titre de l'événement (Optionnel)"),
+     * @OA\Property(property="description", type="string", description="Description de l'événement (Optionnel)"),
+     * @OA\Property(property="place", type="string", description="Lieu de l'événement (Optionnel)"),
+     * @OA\Property(property="date_event", type="string", format="date", description="Date de l'événement (YYYY-MM-DD) (Optionnel)"),
+     * @OA\Property(property="heure", type="string", description="Heure de l'événement (Optionnel)"),
+     * @OA\Property(property="image", type="string", format="binary", description="Nouveau Fichier image (Optionnel, remplace l'ancien)"),
+     * @OA\Property(property="user_id", type="integer", description="ID de l'utilisateur (Optionnel)"),
+     * @OA\Property(property="categorie_id", type="integer", description="ID de la catégorie (Optionnel)"),
+     * @OA\Property(
+     * property="typetickets",
+     * type="string",
+     * description="JSON stringifié (obligatoire pour la mise à jour des tickets). **Tous les anciens tickets seront supprimés et remplacés par cette liste**.",
+     * example="[{""nom"":""VIP M.A.J."",""prix"":180.0,""quantite"":5},{""nom"":""Standard M.A.J."",""prix"":60.0,""quantite"":150}]"
+     * )
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Événement et tickets mis à jour avec succès."
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Événement non trouvé."
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Données de validation manquantes ou invalides."
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Erreur serveur lors de la mise à jour."
+     * )
      * )
      */
-    public function update(Request $request, Evenement $evenement)
+    public function update(Request $request, $id)
     {
-        $evenement->titre = $request->titre;
-        $evenement->description = $request->description;
-        $evenement->place = $request->place;
-        $evenement->date_event = $request->date_event;
-        $evenement->heure = $request->heure;
-        $evenement->user_id = $request->user_id;
-        $evenement->categorie_id = $request->categorie_id;
-        $evenement->save();
+        // 1. Trouver l'événement
+        $evenement = Evenement::find($id);
 
-        return response()->json([
-            'status'=> 'success',
-            'message'=> "Event Updated",
-        ]);
+        if (!$evenement) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Événement non trouvé.'
+            ], 404);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // 2. Préparer les données pour la validation (typetickets)
+            $typetickets = json_decode($request->input('typetickets'), true);
+            $request->merge(['typetickets' => $typetickets]);
+
+            // 3. Définir les règles de validation
+            $validatedData = $request->validate([
+                'titre' => 'sometimes|string|max:255',
+                'description' => 'sometimes|string',
+                'place' => 'sometimes|string',
+                'date_event' => 'sometimes|date',
+                'heure' => 'sometimes|string',
+                // 'sometimes' : l'image est optionnelle, mais si elle est présente, elle doit suivre les règles
+                'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
+                'user_id' => 'sometimes|integer|exists:users,id',
+                'categorie_id' => 'sometimes|integer|exists:categories,id',
+                
+                // Nous rendons 'typetickets' obligatoire pour garantir un ensemble complet de données
+                'typetickets' => 'required|array', 
+                'typetickets.*.nom' => 'required|string|max:255',
+                'typetickets.*.prix' => 'required|numeric|min:0',
+                'typetickets.*.quantite' => 'required|integer|min:1',
+            ]);
+
+            // 4. Mise à jour des champs de l'événement
+            // La méthode fill() est préférable à l'affectation champ par champ pour les données validées
+            $evenement->fill(collect($validatedData)->except(['image', 'typetickets'])->toArray());
+
+            // 5. Gestion de l'image (si une nouvelle image est fournie)
+            if ($request->hasFile('image')) {
+                // Supprimer l'ancienne image si elle existe
+                if ($evenement->image && file_exists(public_path('image_events/' . $evenement->image))) {
+                    unlink(public_path('image_events/' . $evenement->image));
+                }
+                
+                // Enregistrer la nouvelle image
+                $Photo = $request->file('image');
+                $filePhoto = time().'.'.$Photo->getClientOriginalExtension();
+                $Photo->move('image_events', $filePhoto);
+                $evenement->image = $filePhoto;
+            }
+
+            $evenement->save();
+
+            // 6. Mise à jour des Typetickets (Suppression et Recréation)
+            
+            // Suppression des anciens tickets et types de tickets
+            Typeticket::where('evenement_id', $evenement->id)->each(function ($typeticket) {
+                // Supprime d'abord les tickets de stock
+                Ticket::where('typeticket_id', $typeticket->id)->delete();
+                // Supprime ensuite le type de ticket
+                $typeticket->delete();
+            });
+
+            // Création des nouveaux types de tickets et tickets associés
+            foreach ($validatedData['typetickets'] as $typeticketData) {
+                $typeticket = new Typeticket();
+                $typeticket->nom = $typeticketData['nom'];
+                $typeticket->prix = $typeticketData['prix'];
+                $typeticket->evenement_id = $evenement->id;
+                $typeticket->save();
+
+                $ticket = new Ticket();
+                $ticket->typeticket_id = $typeticket->id;
+                $ticket->quantite = $typeticketData['quantite'];
+                $ticket->save();
+            }
+
+            // 7. Valider la transaction
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Événement et tickets mis à jour avec succès.',
+                'data' => $evenement
+            ], 200);
+
+        } catch (\Exception $e) {
+            // 8. Annuler la transaction en cas d'erreur
+            DB::rollBack();
+            // Si c'est une erreur de validation (422), Laravel la gère automatiquement
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                throw $e;
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur serveur lors de la mise à jour de l\'événement ou des tickets.',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

@@ -411,6 +411,51 @@
                 }
             }
         },
+        "/api/evenements/{id}/validate": {
+            "patch": {
+                "summary": "Valider un événement (changer son statut à 1)",
+                "operationId": "dc6372a069c87467ceef7964f6a550d4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'événement à valider.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Événement validé avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Evenement est validé."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Événement non trouvé."
+                    },
+                    "500": {
+                        "description": "Erreur serveur lors de la validation."
+                    }
+                }
+            }
+        },
         "/api/evenements/{id}": {
             "get": {
                 "summary": "Détailles de l'evenement",
@@ -431,13 +476,14 @@
                     }
                 }
             },
-            "put": {
-                "summary": "Mise à jour de l'evenement",
-                "operationId": "4c5cc09e979a893b3a326e10e79dc12a",
+            "post": {
+                "summary": "Mettre à jour un événement existant, son image et ses types de tickets",
+                "operationId": "e17386b5fae730780ebcb02fa1055f4e",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID de l'événement à mettre à jour",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -447,43 +493,52 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
-                                "required": [
-                                    "titre",
-                                    "description",
-                                    "place",
-                                    "date_event",
-                                    "heure",
-                                    "image",
-                                    "user_id",
-                                    "categorie_id"
-                                ],
                                 "properties": {
+                                    "_method": {
+                                        "description": "Champ requis pour simuler la méthode PUT en 'multipart/form-data'",
+                                        "type": "string",
+                                        "default": "PUT"
+                                    },
                                     "titre": {
-                                        "type": "text"
+                                        "description": "Titre de l'événement (Optionnel)",
+                                        "type": "string"
                                     },
                                     "description": {
-                                        "type": "text"
+                                        "description": "Description de l'événement (Optionnel)",
+                                        "type": "string"
                                     },
                                     "place": {
-                                        "type": "text"
+                                        "description": "Lieu de l'événement (Optionnel)",
+                                        "type": "string"
                                     },
                                     "date_event": {
+                                        "description": "Date de l'événement (YYYY-MM-DD) (Optionnel)",
                                         "type": "string",
                                         "format": "date"
                                     },
                                     "heure": {
-                                        "type": "text"
+                                        "description": "Heure de l'événement (Optionnel)",
+                                        "type": "string"
                                     },
                                     "image": {
-                                        "type": "text"
+                                        "description": "Nouveau Fichier image (Optionnel, remplace l'ancien)",
+                                        "type": "string",
+                                        "format": "binary"
                                     },
                                     "user_id": {
-                                        "type": "text"
+                                        "description": "ID de l'utilisateur (Optionnel)",
+                                        "type": "integer"
                                     },
                                     "categorie_id": {
-                                        "type": "text"
+                                        "description": "ID de la catégorie (Optionnel)",
+                                        "type": "integer"
+                                    },
+                                    "typetickets": {
+                                        "description": "JSON stringifié (obligatoire pour la mise à jour des tickets). **Tous les anciens tickets seront supprimés et remplacés par cette liste**.",
+                                        "type": "string",
+                                        "example": "[{\"nom\":\"VIP M.A.J.\",\"prix\":180.0,\"quantite\":5},{\"nom\":\"Standard M.A.J.\",\"prix\":60.0,\"quantite\":150}]"
                                     }
                                 },
                                 "type": "object"
@@ -493,10 +548,16 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Evenement est mise à jour"
+                        "description": "Événement et tickets mis à jour avec succès."
                     },
                     "404": {
-                        "description": "Event not found"
+                        "description": "Événement non trouvé."
+                    },
+                    "422": {
+                        "description": "Données de validation manquantes ou invalides."
+                    },
+                    "500": {
+                        "description": "Erreur serveur lors de la mise à jour."
                     }
                 }
             },

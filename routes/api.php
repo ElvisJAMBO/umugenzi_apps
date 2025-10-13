@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::apiResource('categories',CategoryController::class);
 Route::apiResource('evenements',EvenementController::class);
+Route::patch('/evenements/{id}/validate', [EvenementController::class, 'EventValidation']);
 Route::apiResource('typetickets',TypeticketController::class);
 Route::apiResource('tickets',TicketController::class);
 Route::apiResource('reservations',ReservationController::class);
@@ -55,6 +56,8 @@ Route::apiResource('games',GameController::class);
 Route::get('/groupes/{groupe}/games', [GameController::class, 'gameByGroup']);
 
 Route::get('/evenements/category/{id}', [EvenementController::class, 'filterEvent']);
+
+Route::get('/count-game', [GroupeController::class, 'countGameDay']);
 
 // Routes pour les Rôles
 Route::apiResource('roles', RoleController::class);
