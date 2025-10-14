@@ -8,6 +8,7 @@ use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 class EvenementController extends Controller
 {
@@ -115,9 +116,7 @@ class EvenementController extends Controller
             $evenement->date_event = $validatedData['date_event'];
             $evenement->heure = $validatedData['heure'];
 
-            $Photo = $request->image;
-            $filePhoto = time().'.'.$Photo->getClientOriginalExtension();
-            $request->image->move('image_events',$filePhoto);
+            $filePhoto = $request->file('image')->store('image_events', 'public');
             $evenement->image = $filePhoto;
 
             $evenement->user_id = $validatedData['user_id'];
@@ -349,15 +348,12 @@ class EvenementController extends Controller
 
             // 5. Gestion de l'image (si une nouvelle image est fournie)
             if ($request->hasFile('image')) {
-                // Supprimer l'ancienne image si elle existe
-                if ($evenement->image && file_exists(public_path('image_events/' . $evenement->image))) {
-                    unlink(public_path('image_events/' . $evenement->image));
+                if ($evenement->image) {
+                    Storage::disk('public')->delete($evenement->image);
                 }
                 
-                // Enregistrer la nouvelle image
-                $Photo = $request->file('image');
-                $filePhoto = time().'.'.$Photo->getClientOriginalExtension();
-                $Photo->move('image_events', $filePhoto);
+                $filePhoto = $request->file('image')->store('image_events', 'public');
+                
                 $evenement->image = $filePhoto;
             }
 
