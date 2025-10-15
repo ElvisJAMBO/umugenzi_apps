@@ -58,20 +58,9 @@ class ReservationController extends Controller
         ];
 
         if (auth()->check()) {
-            // Utilisateur connecté : on prend son ID et on ignore les champs name/email/phone
-            $reservationData['user_id'] = auth()->id();
-            $reservationData['name'] = null;
-            $reservationData['email'] = null;
-            $reservationData['phone'] = null;
-        } else {
-            // Utilisateur invité : user_id est null, on utilise les champs name/email/phone du formulaire
-            $reservationData['user_id'] = null; // C'est optionnel car $fillable accepte null, mais plus clair
-            $reservationData['name'] = $data['name'] ?? null;
             $reservationData['email'] = $data['email'] ?? null;
-            $reservationData['phone'] = $data['phone'] ?? null;
-            
-            // **NOTE IMPORTANTE :** Vous devriez ajouter une validation pour vous assurer que ces champs sont
-            // requis si l'utilisateur n'est PAS connecté.
+        } else {
+            $reservationData['email'] = $data['email'] ?? null;
         }
 
 
