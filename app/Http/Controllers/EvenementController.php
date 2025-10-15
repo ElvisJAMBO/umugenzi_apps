@@ -25,7 +25,7 @@ class EvenementController extends Controller
      */
     public function index()
     {
-        $evenements = Evenement::with('user','category')
+        $evenements = Evenement::with('user','categorie', 'typetickets', 'typetickets.tickets')
         ->get();
 
         return response()->json($evenements);
@@ -240,7 +240,7 @@ class EvenementController extends Controller
      */
     public function show(Evenement $evenement)
     {
-        $evenement->load('user', 'category', 'typetickets');
+        $evenement->load('user', 'categorie', 'typetickets', 'typetickets.tickets');
         return response()->json($evenement);
     }
 

@@ -13,6 +13,9 @@ class Reservation extends Model
         'user_id',
         'ticket_id',
         'quantite',
+        'name', 
+        'email',
+        'phone',
     ];
 
     public function user()
@@ -22,6 +25,6 @@ class Reservation extends Model
 
     public function ticket()
     {
-        return $this->belonsTo(Ticket::class);
+        return $this->belongsTo(Ticket::class);
     }
 }
