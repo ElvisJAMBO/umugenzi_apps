@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user()->load('roles', 'permissions'); // Charger les rôles/permissions de l'utilisateur connecté
     });
 
+    Route::get('/evenement-manager', [EvenementController::class, 'eventManager']);
 });
 
 Route::apiResource('categories',CategoryController::class);
@@ -58,6 +59,7 @@ Route::get('/groupes/{groupe}/games', [GameController::class, 'gameByGroup']);
 Route::get('/evenements/category/{id}', [EvenementController::class, 'filterEvent']);
 
 Route::get('/count-game', [GroupeController::class, 'countGameDay']);
+Route::get('/groupe-agent', [GroupeController::class, 'gameAgent']);
 
 // Routes pour les Rôles
 Route::apiResource('roles', RoleController::class);

@@ -51,6 +51,52 @@ class GroupeController extends Controller
 
         // Compte le nombre de jeux pour chaque groupe
         $groupes = $groupes->withCount('games')->latest()
+        ->paginate(10);
+
+        return response()->json($groupes);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/api/groupe-agent",
+     * summary="Récupérer toutes les groupes par jour",
+     * @OA\Parameter(
+     * name="q",
+     * in="query",
+     * description="Terme de recherche pour filtrer les groupes par nom",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Liste des groupes paginée",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="nom", type="string", example="Groupe A"),
+     * )
+     * ),
+     * @OA\Property(property="links", type="object"),
+     * @OA\Property(property="meta", type="object")
+     * )
+     * )
+     * )
+     */
+    public function gameAgent()
+    {
+        $query = request('q');
+
+        $groupes = Groupe::query();
+
+        if ($query) {
+            $groupes->where('name', 'like', "%{$query}%");
+        }
+
+        // Compte le nombre de jeux pour chaque groupe
+        $groupes = $groupes->withCount('games')->latest()
         ->whereDate('created_at', now())
         ->paginate(10);
 

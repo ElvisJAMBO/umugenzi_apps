@@ -411,6 +411,27 @@
                 }
             }
         },
+        "/api/evenement-manager": {
+            "get": {
+                "summary": "Toutes les evenements validés du manager",
+                "operationId": "b8f13748f73a817583e35111fd57e644",
+                "responses": {
+                    "200": {
+                        "description": "Liste des evenements",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/evenements/{id}/validate": {
             "patch": {
                 "summary": "Valider un événement (changer son statut à 1)",
@@ -926,6 +947,59 @@
                 "responses": {
                     "201": {
                         "description": "Groupe est crée"
+                    }
+                }
+            }
+        },
+        "/api/groupe-agent": {
+            "get": {
+                "summary": "Récupérer toutes les groupes par jour",
+                "operationId": "6aed908c301a6a2ee3a9e36621e13aaa",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Terme de recherche pour filtrer les groupes par nom",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des groupes paginée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nom": {
+                                                        "type": "string",
+                                                        "example": "Groupe A"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }

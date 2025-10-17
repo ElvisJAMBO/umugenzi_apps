@@ -32,11 +32,24 @@ class EvenementController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @OA\Get(
+     *     path="/api/evenement-manager",
+     *     summary="Toutes les evenements validés du manager",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des evenements",
+     *         @OA\JsonContent(type="array", @OA\Items(type="string"))
+     *     )
+     * )
      */
-    public function create()
+    public function eventManager()
     {
-        //
+        $evenements = Evenement::with('user','categorie', 'typetickets', 'typetickets.tickets')
+        ->where('user_id', auth()->id())
+        ->where('statut_validation', 1)
+        ->get();
+
+        return response()->json($evenements);
     }
 
     /**
