@@ -25,6 +25,11 @@ class Reservation extends Model
 
     public function ticket()
     {
-        return $this->belongsTo(Ticket::class);
+        return $this->belongsTo(Ticket::class, 'ticket_id');
+    }
+
+    public function ticketinstances()
+    {
+        return $this->hasMany(Ticketinstance::class);
     }
 }

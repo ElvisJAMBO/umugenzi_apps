@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Reservation;
 use App\Models\Ticket;
+use App\Models\Ticketinstance;
+use Illuminate\Support\Facades\DB;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Http\Request;
 
 class ReservationController extends Controller
@@ -43,40 +46,67 @@ class ReservationController extends Controller
             // Note: Si vous utilisez l'ID de l'utilisateur connecté, ce champ n'est pas nécessaire dans le formulaire.
         ]);
 
+        $quantity = $data['quantite'];
+        $ticketStockId = $data['ticket_id'];
 
-        // 2. Vérification de la disponibilité du ticket
-        $ticket = Ticket::find($data['ticket_id']);
+        try {
+            DB::beginTransaction();
 
-        if($ticket->quantite < $data['quantite']) {
-            return response()->json(['error' => 'Quantité de tickets non disponible.'], 400);
+            // 2. Verrouillage du stock et vérification de la disponibilité
+            // Utilisation de lockForUpdate() pour éviter les problèmes de concurrence (double-réservation)
+            $stock = Ticket::where('id', $ticketStockId)
+                ->lockForUpdate() 
+                ->firstOrFail();
+
+            if ($stock->quantite_initiales < $quantity) {
+                DB::rollBack(); // Annuler si le stock est insuffisant
+                return response()->json(['error' => 'Quantité de tickets non disponible (stock restant: ' . $stock->quantite_initiales . ').'], 400);
+            }
+            
+            // 3. Détermination du prix et calcul du montant
+            // Chargement de la relation typeticket pour obtenir le prix
+            $stock->load('typeticket'); 
+            $prixUnitaire = $stock->typeticket->prix;
+            $montantTotal = $quantity * $prixUnitaire;
+
+            // 4. Création de la ligne de Reservation
+            $reservation = Reservation::create([
+                // Mappage avec votre schéma initial
+                'ticket_id' => $ticketStockId,
+                'email' => $data['email'], 
+                'quantite' => $quantity,
+            ]);
+
+            // 5. Mise à jour de la quantité de stock
+            $stock->quantite_sorties += $quantity;
+            $stock->quantite_initiales -= $quantity;
+            $stock->save();
+
+            // 6. Création des instances de Ticket avec génération automatique des codes (Insertion en masse)
+            Ticketinstance::createTicketInstances($reservation, $quantity);
+
+            // 7. Si tout a réussi, valider la transaction
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Réservation créée avec succès. ' . $quantity . ' tickets générés.',
+                'reservation_id' => $reservation->id,
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack(); // Annuler en cas d'erreur
+            // Loggez l'erreur pour le débogage
+            \Log::error("Erreur de réservation: " . $e->getMessage()); 
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erreur lors du traitement de la réservation.',
+                'details' => $e->getMessage() // À ne pas afficher en production
+            ], 500);
         }
-        
-        // 3. Détermination des données de l'utilisateur
-        $reservationData = [
-            'ticket_id' => $ticket->id,
-            'quantite' => $data['quantite'],
-        ];
-
-        if (auth()->check()) {
-            $reservationData['email'] = $data['email'] ?? null;
-        } else {
-            $reservationData['email'] = $data['email'] ?? null;
-        }
-
-
-        // 4. Création de la réservation
-        $reservation = Reservation::create($reservationData);
-
-        // 5. Mise à jour de la quantité de tickets
-        $ticket->quantite -= $data['quantite'];
-        $ticket->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Réservation créée',
-            'reservation' => $reservation // Utile pour le front-end
-        ], 201);
     }
+
 
     /**
      * Display the specified resource.

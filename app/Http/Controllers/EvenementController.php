@@ -146,6 +146,8 @@ class EvenementController extends Controller
                 $ticket = new Ticket();
                 $ticket->typeticket_id = $typeticket->id;
                 $ticket->quantite = $typeticketData['quantite'];
+                $ticket->quantite_sorties = 0;
+                $ticket->quantite_initiales = $typeticketData['quantite'];
                 $ticket->save();
             }
 

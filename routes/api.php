@@ -15,6 +15,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GiftController;
+use App\Http\Controllers\HistoriqueeventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/evenement-manager', [EvenementController::class, 'eventManager']);
+Route::post('historiques/valider/{evenement}', [HistoriqueeventController::class, 'store']);
 });
 
 Route::apiResource('categories',CategoryController::class);
@@ -60,6 +62,9 @@ Route::get('/evenements/category/{id}', [EvenementController::class, 'filterEven
 
 Route::get('/count-game', [GroupeController::class, 'countGameDay']);
 Route::get('/groupe-agent', [GroupeController::class, 'gameAgent']);
+
+//Historiques des événements
+Route::get('historiques', [HistoriqueeventController::class, 'index']);
 
 // Routes pour les Rôles
 Route::apiResource('roles', RoleController::class);

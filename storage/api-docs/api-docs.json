@@ -1146,6 +1146,39 @@
                 }
             }
         },
+        "/api/historiques": {
+            "get": {
+                "summary": "Historiques des événements",
+                "operationId": "412bc3ba1a3ba5626c4e0d98c7783972",
+                "responses": {
+                    "200": {
+                        "description": "Liste des historiques"
+                    }
+                }
+            }
+        },
+        "/api/historiques/valider/{evenement}": {
+            "post": {
+                "summary": "Valider la participation de l'utilisateur actuel à un événement",
+                "operationId": "3cf72fe796a3da1be29802d24022c032",
+                "parameters": [
+                    {
+                        "name": "Evenement à valide",
+                        "in": "path",
+                        "description": "ID de l'événement à valide",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Succès de la validation de l'événement"
+                    }
+                }
+            }
+        },
         "/api/permissions": {
             "get": {
                 "summary": "Récupérer toutes les permissions",
