@@ -16,6 +16,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GiftController;
 use App\Http\Controllers\HistoriqueeventController;
+use App\Http\Controllers\TicketagentController;
+use App\Http\Controllers\TicketdistributionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,15 +46,28 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/evenement-manager', [EvenementController::class, 'eventManager']);
-Route::post('historiques/valider/{evenement}', [HistoriqueeventController::class, 'store']);
+    Route::post('historiques/valider/{evenement}', [HistoriqueeventController::class, 'store']);
+    Route::get('/me/assigned-tickets', [TicketagentController::class, 'getMyAssignedTickets']);
 });
+
+Route::get('/users/assigned-tickets', [TicketagentController::class, 'getAllUsersWithAssignedTickets']);
 
 Route::apiResource('categories',CategoryController::class);
 Route::apiResource('evenements',EvenementController::class);
+Route::get('/events/today', [EvenementController::class, 'eventsToday']);
 Route::patch('/evenements/{id}/validate', [EvenementController::class, 'EventValidation']);
 Route::apiResource('typetickets',TypeticketController::class);
 Route::apiResource('tickets',TicketController::class);
 Route::apiResource('reservations',ReservationController::class);
+
+Route::post('/validate-ticket/{evenementId}', [ReservationController::class, 'validateTicket']);
+
+Route::get('/ticket-all', [ReservationController::class, 'allTicket']);
+Route::get('/ticket-by-event/{evenementId}', [ReservationController::class, 'getTicketsByEventId']);
+Route::get('/ticket-by-event-and-payment-status/{evenementId}/{isPaid}', [ReservationController::class, 'getTicketsByEventAndPaymentStatus']);
+
+Route::apiResource('ticketdistributions',TicketdistributionController::class);
+
 Route::apiResource('groupes',GroupeController::class);
 Route::get('/groupe/{groupeId}/tirage', [GroupeController::class, 'effectuerTirageAuSort']);
 Route::apiResource('games',GameController::class);
@@ -82,5 +97,7 @@ Route::put('update-user/{user}', [ProfileController::class, 'update']);
 //Route pour les cadeaux
 Route::apiResource('gifts', GiftController::class);
     
+Route::post('/tickets/assign', [TicketagentController::class, 'assign']);
+Route::get('/tickets/assigned', [TicketagentController::class, 'index']);
 
 

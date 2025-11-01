@@ -52,6 +52,17 @@ class EvenementController extends Controller
         return response()->json($evenements);
     }
 
+    public function eventsToday()
+    {
+        $today = now()->toDateString();
+        
+        $events = Evenement::whereDate('date_event', $today)
+                        ->select('id', 'titre', 'place', 'date_event', 'heure')
+                        ->get();
+
+        return response()->json($events);
+    }
+
     /**
      * @OA\Post(
      * path="/api/evenements",

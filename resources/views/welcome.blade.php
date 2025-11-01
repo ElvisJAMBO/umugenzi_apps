@@ -2,196 +2,192 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billet d'Événement - Festival des Étoiles</title>
+    <title>Tickets</title>
     <style>
-        :root {
-            /* Couleurs du design */
-            --main-color: #0c183a; /* Bleu marine foncé, presque noir */
-            --text-color: #ffffff; /* Blanc pour le texte */
-            --accent-color: #f7a040; /* Orange/Jaune pour l'accentuation, si besoin */
-            --perforation-color: #3f51b5; /* Couleur de la ligne de perforation */
+        /* CSS adapté pour dompdf - Utilisez des styles simples */
+        body {
+            font-family: 'DejaVu Sans', sans-serif; /* DejaVu Sans est souvent nécessaire pour les PDF */
+            margin: 0;
+            padding: 0;
+            font-size: 10px; /* Taille de base plus petite pour le PDF */
         }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0; /* Fond gris clair pour voir le ticket */
-            margin: 0;
+        :root {
+            --main-color: #0c183a; /* Bleu marine foncé */
+            --accent-color: #f7a040; /* Orange/Jaune */
+            --paper-color: #f0f0f0; /* Fond de page */
         }
 
         .ticket-container {
-            display: flex;
-            width: 630px; /* Env. 210mm à 96dpi (7 pouces) */
-            height: 222px; /* Env. 74mm à 96dpi (2.75 pouces) */
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            width: 200mm; /* Largeur fixe, env. 210mm total pour A4, ici pour le ticket */
+            height: 70mm;  /* Hauteur fixe */
+            margin: 10mm auto; /* Centrer sur la page */
+            background-color: #0c183a; /* Couleur principale */
+            color: #ffffff; /* Texte blanc */
             border-radius: 8px;
             overflow: hidden;
             position: relative;
-            color: var(--text-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* ------------------ Section Principale (2/3) ------------------ */
-        .ticket-main {
-            flex: 2; /* Prend 2/3 de la largeur */
-            background-color: var(--main-color);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            
-            /* Pour intégrer l'image d'arrière-plan des étoiles */
-            /* background-image: url('votre_image_etoiles.jpg'); 
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.2; /* Transparence de l'image (l'image sera visible sous la couleur du conteneur) */
+            z-index: 1; /* Reste en dessous du contenu */
             background-size: cover;
-            background-position: center; */
+            background-repeat: no-repeat;
+            background-position: center center;
         }
+        
+        /* Placeholder pour le fond (REMPLACEZ L'URL ABSOLUE PAR VOTRE IMAGE EN BASE64 OU URL COMPLÈTE) */
+        /* Exemple de fond en base64 (plus fiable pour Dompdf) */
+        
 
-        .title {
-            font-size: 2.2em;
-            font-weight: 800;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .organizer {
-            font-size: 0.8em;
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
-
-        .info-block {
-            margin-bottom: 10px;
-        }
-
-        .datetime {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin: 0 0 5px 0;
-        }
-
-        .location {
-            font-size: 0.9em;
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        .qr-code-area {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .qr-code-placeholder {
-            width: 80px;
-            height: 80px;
-            background-color: var(--text-color); /* Le QR code doit être clair */
-            border: 5px solid var(--text-color); 
-            /* Simulation du motif du QR code */
-            background-image: repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 4px);
-            margin-bottom: 5px;
-        }
-
-        .scan-text {
-            font-size: 0.7em;
-            opacity: 0.7;
-            margin: 0;
-        }
-
-        /* ------------------ Section Souche (1/3) ------------------ */
-        .ticket-stub {
-            flex: 1; /* Prend 1/3 de la largeur */
-            background-color: var(--main-color);
-            position: relative;
-            border-left: 2px dashed var(--text-color); /* Ligne de perforation simulée */
-        }
-
-        .stub-content {
+        /* ------------------ STRUCTURE DU TICKET ------------------ */
+        .ticket-main, .ticket-stub {
+            float: left;
+            height: 100%;
+            box-sizing: border-box;
             padding: 15px;
+            position: relative; /* Nécessaire pour positionner le contenu au-dessus du background-overlay */
+            z-index: 5; 
+        }
+
+        .ticket-main {
+            width: 70%;
+            background-color: rgba(12, 24, 58, 0.9); /* Utilisez une opacité légère pour laisser passer le fond */
+        }
+
+        .ticket-stub {
+            width: 30%;
+            border-left: 1px dashed #ffffff;
+            text-align: center;
+            background-color: rgba(12, 24, 58, 0.85); /* Légèrement plus foncé */
+        }
+        
+        /* ------------------ MISE EN PAGE INTERNE DU MAIN ------------------ */
+        .main-content {
+            /* Contient le titre, l'organisateur, et les infos */
+            float: left;
+            width: 60%; /* Espace pour le texte */
+        }
+        
+        .qr-code-wrapper {
+            /* Contient le QR code et le texte d'instruction */
+            float: right;
+            width: 38%; /* Espace pour le QR code */
             text-align: center;
         }
 
-        .stub-header {
-            font-size: 0.7em;
-            opacity: 0.8;
-            line-height: 1.2;
-            margin-bottom: 10px;
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
         }
 
-        .stub-label {
-            font-size: 0.7em;
-            margin: 5px 0 0 0;
-            opacity: 0.6;
+        /* ------------------ TYPOGRAPHIE ET ELEMENTS ------------------ */
+        .title { font-size: 2.4em; font-weight: bold; margin: 0 0 5px 0; text-transform: uppercase; }
+        .organizer { font-size: 1.4em; opacity: 0.8; margin-bottom: 10px; }
+        .info-block p { margin: 3px 0; font-size: 1.4em; }
+        .datetime { font-weight: bold; font-size: 1.4em; }
+
+        /* QR CODE (dans le wrapper) */
+        .qr-code img {
+            /* ⚠️ Taille augmentée pour le ticket-main */
+            width: 180px; 
+            height: 180px;
+            background-color: white; 
+            padding: 5px;
+            border-radius: 3px;
         }
 
-        .ticket-number {
-            font-size: 2.5em;
-            font-weight: 900;
-            margin: 0 0 15px 0;
-            color: var(--text-color); 
-        }
+        .scan-text { font-size: 0.7em; opacity: 0.9; margin-top: 5px; }
 
-        .qr-code-placeholder.small {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto;
-        }
-
-        /* ------------------ Effet de Perforation (Facultatif) ------------------ */
-        /* Ajout d'une petite décoration sur le bord de la souche pour l'effet "déchiré" */
-        .ticket-stub::before,
-        .ticket-stub::after {
-            content: '';
+        /* STUB */
+        .stub-content {
+            /* Centrer le contenu du stub */
             position: absolute;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: #f0f0f0; /* Couleur du fond de la page */
-            left: -8px; 
-            z-index: 10;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+        }
+        .stub-header { font-size: 1.4em; line-height: 1.2; margin-bottom: 10px; }
+        .stub-label { font-size: 1.2em; opacity: 0.6; margin: 5px 0 0 0; }
+        .ticket-number { font-size: 1.5em; font-weight: bold; margin: 0 0 10px 0; color: var(--accent-color); }
+        
+        /* QR CODE dans le stub (taille réduite) */
+        .ticket-stub .qr-code img {
+            width: 100px; /* Taille réduite */
+            height: 100px;
         }
 
-        .ticket-stub::before {
-            top: -8px;
+        /* ------------------ EFFETS DIVERS ------------------ */
+        .ticket-stub::before, .ticket-stub::after {
+            content: ''; position: absolute; width: 10px; height: 10px; border-radius: 50%; 
+            background-color: var(--paper-color); left: -5px; z-index: 10;
         }
+        .ticket-stub::before { top: -5px; }
+        .ticket-stub::after { bottom: -5px; }
 
-        .ticket-stub::after {
-            bottom: -8px;
-        }
     </style>
 </head>
 <body>
+    @foreach($ticketInstances as $ticketInstance)
     <div class="ticket-container">
         <div class="ticket-main">
-            <h1 class="title">FESTIVAL DES ÉTOILES</h1>
-            <p class="organizer">Organisé par: **Lumière Événements**</p>
+            <div class="background-overlay" style="background-image: url('/image_events/{{ $ticketInstance->reservation->ticket->typeticket->evenement->image }}');"></div>
             
-            <div class="info-block">
-                <p class="datetime">SAMEDI 20 MAI - **19H00**</p>
-                <p class="location">Lieu : **LE GRAND DÔME - SALLE ALPHA**</p>
+            <div class="clearfix" style="position: relative; z-index: 10;">
+                <div class="main-content">
+                    <h1 class="title">{{ strtoupper($ticketInstance->reservation->ticket->typeticket->evenement->titre) }}</h1>
+                    <p class="organizer">Organisé par : {{ $ticketInstance->reservation->ticket->typeticket->evenement->user->name }}</p>
+                    
+                    <div class="info-block">
+                        <p class="datetime">
+                            {{ \Carbon\Carbon::parse($ticketInstance->reservation->ticket->typeticket->evenement->date_event)->format('d/m/Y') }} 
+                            @if ($ticketInstance->reservation->ticket->typeticket->evenement->heure)
+                                à {{ \Carbon\Carbon::parse($ticketInstance->reservation->ticket->typeticket->evenement->heure)->format('H:i') }}
+                            @endif
+                        </p>
+                        <p class="location">Lieu : {{ $ticketInstance->reservation->ticket->typeticket->evenement->place }}</p>
+                        <p>Type : {{ $ticketInstance->reservation->ticket->typeticket->nom }}</p>
+                    </div>
+                </div>
+
+                <div class="qr-code-wrapper">
+                    <div class="qr-code">
+                        <img src="{{ $ticketInstance->qr_code }}" 
+                            alt="Code QR du billet" 
+                            style="width: 180px; height: 180px; padding: 5px; background-color: white;">
+                    </div>
+                    <p class="scan-text">SCANNEZ À L'ENTRÉE</p>
+                </div>
             </div>
-            
-            <div class="qr-code-area">
-                <div class="qr-code-placeholder"></div>
-                <p class="scan-text">SCANNEZ À L'ENTRÉE</p>
-            </div>
-            
         </div>
 
         <div class="ticket-stub">
-            <div class="perforation-line"></div>
-            <div class="stub-content">
-                <p class="stub-header">FESTIVAL DES ÉTOILES<br>20 MAI</p>
+            <div class="background-overlay" style="background-image: url('/image_events/1757316031.téléchargement.jpeg');"></div>
+            
+            <div class="stub-content" style="position: relative; z-index: 10;">
+                <p class="stub-header">{{ strtoupper($ticketInstance->reservation->ticket->typeticket->evenement->titre) }}<br>
+                    {{ \Carbon\Carbon::parse($ticketInstance->reservation->ticket->typeticket->evenement->date_event)->format('d/m/Y') }}</p>
                 
                 <p class="stub-label">BILLET N°:</p>
-                <p class="ticket-number">**007A**</p>
+                <p class="ticket-number">{{ $ticketInstance->id }}</p>
                 
-                <div class="qr-code-placeholder small"></div>
+                <div class="qr-code">
+                    <img src="{{ $ticketInstance->qr_code }}" 
+                        alt="Code QR du billet" 
+                        style="width: 100px; height: 100px; padding: 3px; background-color: white;">
+                </div>
             </div>
         </div>
     </div>
+    @endforeach
 </body>
 </html>
